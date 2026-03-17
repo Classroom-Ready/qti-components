@@ -40424,6 +40424,14 @@
             },
             {
               "kind": "field",
+              "name": "navigationMode",
+              "type": {
+                "text": "'linear' | 'nonlinear' | undefined"
+              },
+              "attribute": "navigation-mode"
+            },
+            {
+              "kind": "field",
               "name": "required",
               "type": {
                 "text": "string"
@@ -40475,6 +40483,13 @@
                 "text": "boolean"
               },
               "fieldName": "keepTogether"
+            },
+            {
+              "name": "navigation-mode",
+              "type": {
+                "text": "'linear' | 'nonlinear' | undefined"
+              },
+              "fieldName": "navigationMode"
             },
             {
               "name": "required",
@@ -41791,7 +41806,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] }"
               }
             },
             {
@@ -41976,7 +41991,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] }"
               }
             },
             {
@@ -42082,7 +42097,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] }"
               }
             },
             {
@@ -42185,8 +42200,17 @@
             {
               "kind": "method",
               "name": "checkDisabled",
+              "parameters": [
+                {
+                  "name": "navigationMode",
+                  "optional": true,
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
               "type": {
-                "text": "checkDisabled() => void"
+                "text": "checkDisabled(navigationMode?: string) => void"
               }
             },
             {
@@ -42197,7 +42221,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] }"
               }
             },
             {
@@ -42279,7 +42303,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] } | undefined"
               }
             }
           ],
@@ -42329,7 +42353,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] } | undefined"
               }
             }
           ],
@@ -42392,7 +42416,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] } | undefined"
               }
             },
             {
@@ -42494,7 +42518,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] } | undefined"
               }
             },
             {
@@ -42586,7 +42610,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] }"
               }
             },
             {
@@ -42747,7 +42771,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] } | undefined"
               }
             },
             {
@@ -42895,7 +42919,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; }[]; }[] }"
               }
             },
             {
