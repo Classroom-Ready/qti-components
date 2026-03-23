@@ -5,6 +5,7 @@ export * from '../components/qti-assessment-section/qti-assessment-section';
 export * from '../components/qti-assessment-test/qti-assessment-test';
 export * from '../components/qti-test-part/qti-test-part';
 export * from '../components/qti-test-feedback/qti-test-feedback';
+export * from '../components/qti-item-session-control/qti-item-session-control';
 
 export * from './test-navigation/test-navigation';
 export * from './test-next/test-next';

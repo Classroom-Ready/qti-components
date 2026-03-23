@@ -36799,6 +36799,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/qti-test/src/components/qti-item-session-control/qti-item-session-control"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/qti-test/src/components/test-navigation/test-navigation"
           }
         },
@@ -37364,6 +37372,175 @@
           "declaration": {
             "name": "QtiAssessmentTest",
             "module": "packages/qti-test/src/components/qti-assessment-test/qti-assessment-test.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/qti-test/src/components/qti-item-session-control/qti-item-session-control.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "QtiItemSessionControl",
+          "members": [
+            {
+              "kind": "field",
+              "name": "allowComment",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'false'",
+              "attribute": "allow-comment"
+            },
+            {
+              "kind": "field",
+              "name": "allowReview",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'true'",
+              "attribute": "allow-review"
+            },
+            {
+              "kind": "field",
+              "name": "allowSkipping",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'true'",
+              "attribute": "allow-skipping"
+            },
+            {
+              "kind": "field",
+              "name": "maxAttempts",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "attribute": "max-attempts"
+            },
+            {
+              "kind": "field",
+              "name": "showFeedback",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'false'",
+              "attribute": "show-feedback"
+            },
+            {
+              "kind": "field",
+              "name": "showSolution",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'false'",
+              "attribute": "show-solution"
+            },
+            {
+              "kind": "field",
+              "name": "validateResponses",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'false'",
+              "attribute": "validate-responses"
+            }
+          ],
+          "events": [
+            {
+              "name": "qti-item-session-control-connected",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "allow-comment",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'false'",
+              "fieldName": "allowComment"
+            },
+            {
+              "name": "allow-review",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'true'",
+              "fieldName": "allowReview"
+            },
+            {
+              "name": "allow-skipping",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'true'",
+              "fieldName": "allowSkipping"
+            },
+            {
+              "name": "max-attempts",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "fieldName": "maxAttempts"
+            },
+            {
+              "name": "show-feedback",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'false'",
+              "fieldName": "showFeedback"
+            },
+            {
+              "name": "show-solution",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'false'",
+              "fieldName": "showSolution"
+            },
+            {
+              "name": "validate-responses",
+              "type": {
+                "text": "'true' | 'false'"
+              },
+              "default": "'false'",
+              "fieldName": "validateResponses"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "summary": "The qti-item-session-control element contains configurations relating to flow of test sessions.",
+          "tagName": "qti-item-session-control",
+          "customElement": true,
+          "modulePath": "packages/qti-test/src/components/qti-item-session-control/qti-item-session-control.ts",
+          "definitionPath": "packages/qti-test/src/components/qti-item-session-control/qti-item-session-control.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "qti-item-session-control",
+          "declaration": {
+            "name": "QtiItemSessionControl",
+            "module": "packages/qti-test/src/components/qti-item-session-control/qti-item-session-control.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QtiItemSessionControl",
+          "declaration": {
+            "name": "QtiItemSessionControl",
+            "module": "packages/qti-test/src/components/qti-item-session-control/qti-item-session-control.ts"
           }
         }
       ]
