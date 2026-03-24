@@ -40729,27 +40729,27 @@
               "kind": "field",
               "name": "allowComment",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'false'",
+              "default": "false",
               "attribute": "allow-comment"
             },
             {
               "kind": "field",
               "name": "allowReview",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'true'",
+              "default": "true",
               "attribute": "allow-review"
             },
             {
               "kind": "field",
               "name": "allowSkipping",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'true'",
+              "default": "true",
               "attribute": "allow-skipping"
             },
             {
@@ -40765,27 +40765,27 @@
               "kind": "field",
               "name": "showFeedback",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'false'",
+              "default": "false",
               "attribute": "show-feedback"
             },
             {
               "kind": "field",
               "name": "showSolution",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'false'",
+              "default": "false",
               "attribute": "show-solution"
             },
             {
               "kind": "field",
               "name": "validateResponses",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'false'",
+              "default": "false",
               "attribute": "validate-responses"
             }
           ],
@@ -40801,25 +40801,25 @@
             {
               "name": "allow-comment",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'false'",
+              "default": "false",
               "fieldName": "allowComment"
             },
             {
               "name": "allow-review",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'true'",
+              "default": "true",
               "fieldName": "allowReview"
             },
             {
               "name": "allow-skipping",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'true'",
+              "default": "true",
               "fieldName": "allowSkipping"
             },
             {
@@ -40833,25 +40833,25 @@
             {
               "name": "show-feedback",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'false'",
+              "default": "false",
               "fieldName": "showFeedback"
             },
             {
               "name": "show-solution",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'false'",
+              "default": "false",
               "fieldName": "showSolution"
             },
             {
               "name": "validate-responses",
               "type": {
-                "text": "'true' | 'false'"
+                "text": "boolean"
               },
-              "default": "'false'",
+              "default": "false",
               "fieldName": "validateResponses"
             }
           ],
@@ -41773,7 +41773,68 @@
           "kind": "class",
           "description": "",
           "name": "TestEndAttempt",
-          "members": [],
+          "members": [
+            {
+              "kind": "method",
+              "name": "_handleTestElementChange",
+              "parameters": [
+                {
+                  "name": "_oldValue",
+                  "type": {
+                    "text": "ComputedContext"
+                  }
+                },
+                {
+                  "name": "newValue",
+                  "type": {
+                    "text": "ComputedContext"
+                  }
+                }
+              ],
+              "type": {
+                "text": "_handleTestElementChange(_oldValue: ComputedContext, newValue: ComputedContext) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_internalDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "public",
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "checkDisabled",
+              "type": {
+                "text": "checkDisabled() => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "computedContext",
+              "type": {
+                "text": "ComputedContext"
+              },
+              "privacy": "protected",
+              "parsedType": {
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "_internalDisabled"
+            }
+          ],
           "superclass": {
             "name": "LitElement",
             "package": "lit"
@@ -42060,7 +42121,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -42245,7 +42306,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -42351,7 +42412,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -42466,7 +42527,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -42548,7 +42609,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             }
           ],
@@ -42598,7 +42659,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             }
           ],
@@ -42661,7 +42722,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -42763,7 +42824,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -42855,7 +42916,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -43016,7 +43077,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -43164,7 +43225,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; sections: { active?: boolean; identifier: string; title: string; completed?: boolean; items: ComputedItem[]; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultane... }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {

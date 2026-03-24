@@ -4,7 +4,10 @@ import { findByShadowText, within } from 'shadow-dom-testing-library';
 import { spread } from '@open-wc/lit-helpers';
 import { html } from 'lit';
 
-import { getAssessmentItemFromTestContainerByDataTitle } from '../../../../../tools/testing/test-utils';
+import {
+  getAssessmentItemFromTestContainerByDataTitle,
+  getAssessmentItemsFromTestContainer
+} from '../../../../../tools/testing/test-utils';
 
 import type { TestEndAttempt } from './test-end-attempt';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
@@ -80,5 +83,52 @@ export const Test: Story = {
     // check if correct feedback block is visible
     const correct = await canvas.findByShadowText('Correct');
     expect(correct.assignedSlot).toBeVisible();
+  }
+};
+
+export const NonSkippingItems: Story = {
+  render: args => html`
+    <qti-test navigate="item">
+      <test-navigation>
+        <test-container test-url="/assets/qti-test-package/assessment-nonskipping.xml"> </test-container>
+        <test-end-attempt ${spread(args)}>End Attempt</test-end-attempt>
+        <test-next>Volgende</test-next>
+      </test-navigation>
+    </qti-test>
+  `,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // wait for items to load
+    const items = await getAssessmentItemsFromTestContainer(canvasElement);
+
+    const endAttemptButton = await findByShadowText(canvasElement, 'End Attempt');
+    const nextButton = await findByShadowText(canvasElement, 'Volgende');
+
+    // Button should be disabled initially (choice not selected, allow-skipping=false)
+    expect(endAttemptButton).toBeDisabled();
+
+    // Select a choice in the first item
+    const item = items[0];
+    const choice = item.querySelector('qti-simple-choice');
+    choice.click();
+
+    // Now it should be enabled for individual submission
+    await waitFor(() => expect(endAttemptButton).toBeEnabled());
+
+    // Navigate to second item
+    endAttemptButton.click();
+    await waitFor(() => expect(nextButton).toBeEnabled());
+    nextButton.click();
+
+    // Initially second item is empty, so end attempt should be disabled again
+    await waitFor(() => expect(nextButton).toBeDisabled());
+
+    // type in the text field
+    const textEntryInteraction = (await canvas.findByShadowRole('textbox')) as HTMLInputElement;
+    await userEvent.type(textEntryInteraction, 'anything');
+
+    // Now it should be enabled
+    await waitFor(() => expect(endAttemptButton).toBeEnabled());
   }
 };
