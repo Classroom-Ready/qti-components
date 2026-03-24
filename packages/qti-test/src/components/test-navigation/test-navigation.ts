@@ -2,24 +2,23 @@ import { consume, provide } from '@lit/context';
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-import { computedContext } from '@qti-components/base';
-import { configContext } from '@qti-components/base';
-import { testContext } from '@qti-components/base';
-import { sessionContext } from '@qti-components/base';
-import { qtiContext } from '@qti-components/base';
+import { computedContext, configContext, qtiContext, sessionContext, testContext } from '@qti-components/base';
 
-import type { QtiAssessmentItem } from '@qti-components/elements';
-import type { QtiContext } from '@qti-components/base';
-import type { OutcomeVariable } from '@qti-components/base';
-import type { ComputedContext } from '@qti-components/base';
+import type {
+  ComputedContext,
+  ConfigContext,
+  OutcomeVariable,
+  QtiContext,
+  SessionContext,
+  TestContext
+} from '@qti-components/base';
 import type { PropertyValues } from 'lit';
+import type { QtiAssessmentItem } from '@qti-components/elements';
 import type { QtiAssessmentItemRef } from '../qti-assessment-item-ref/qti-assessment-item-ref';
 import type { QtiAssessmentSection } from '../qti-assessment-section/qti-assessment-section';
 import type { QtiAssessmentTest } from '../qti-assessment-test/qti-assessment-test';
 import type { QtiTestPart } from '../qti-test-part/qti-test-part';
-import type { ConfigContext } from '@qti-components/base';
-import type { SessionContext } from '@qti-components/base';
-import type { TestContext } from '@qti-components/base';
+import type { QtiItemSessionControl } from '../qti-item-session-control/qti-item-session-control';
 
 type CustomEventMap = {
   'test-end-attempt': CustomEvent;
@@ -232,27 +231,46 @@ export class TestNavigation extends LitElement {
       view: this._sessionContext?.view,
       testParts: testPartElements.map(testPart => {
         const sectionElements = [...testPart.querySelectorAll<QtiAssessmentSection>(`qti-assessment-section`)];
+        const testPartSessionControl = testPart.querySelector<QtiItemSessionControl>(
+          ':scope > qti-item-session-control'
+        );
+        const partAllowSkipping = testPartSessionControl ? testPartSessionControl.allowSkipping : true;
         return {
           active: false,
           identifier: testPart.identifier,
           navigationMode: testPart.navigationMode,
           submissionMode: testPart.submissionMode,
+          allowSkipping: partAllowSkipping,
           sections: sectionElements.map(section => {
             const itemElements = [...section.querySelectorAll<QtiAssessmentItemRef>(`qti-assessment-item-ref`)];
+            const sectionSessionControl = section.querySelector<QtiItemSessionControl>(
+              ':scope > qti-item-session-control'
+            );
+            const sectionAllowSkipping = sectionSessionControl
+              ? sectionSessionControl.allowSkipping
+              : partAllowSkipping;
             return {
               active: false,
               identifier: section.identifier,
               title: section.title,
               navigationMode: section.navigationMode,
               submissionMode: section.submissionMode,
-              items: itemElements.map(item => ({
-                ...this.initContext?.find(i => i.identifier === item.identifier),
-                active: false,
-                identifier: item.identifier,
-                categories: item.category ? item.category?.split(' ') : [],
-                href: item.href,
-                variables: [] as OutcomeVariable[]
-              }))
+              allowSkipping: sectionAllowSkipping,
+              items: itemElements.map(item => {
+                const itemSessionControl = item.querySelector<QtiItemSessionControl>(
+                  ':scope > qti-item-session-control'
+                );
+                const itemAllowSkipping = itemSessionControl ? itemSessionControl.allowSkipping : sectionAllowSkipping;
+                return {
+                  ...this.initContext?.find(i => i.identifier === item.identifier),
+                  active: false,
+                  identifier: item.identifier,
+                  categories: item.category ? item.category?.split(' ') : [],
+                  href: item.href,
+                  variables: [] as OutcomeVariable[],
+                  allowSkipping: itemAllowSkipping
+                };
+              })
             };
           })
         };
@@ -405,6 +423,47 @@ export class TestNavigation extends LitElement {
 
                 const active = this._sessionContext?.navItemRefId === computedItem.identifier || false;
 
+                const qtiItemEl = this.#testElement?.querySelector<QtiAssessmentItemRef>(
+                  `qti-assessment-item-ref[identifier="${computedItem.identifier}"]`
+                );
+                const valid = qtiItemEl?.assessmentItem?.validate(false) ?? true;
+
+                const responseVars = itemContext?.variables?.filter(v => v.type === 'response') || [];
+
+                const isDefaultResponse = responseVars.every(v => {
+                  if (v.value === undefined || v.value === null) {
+                    return true;
+                  }
+                  let fallbackValue: string;
+                  switch (v.baseType) {
+                    case 'integer':
+                    case 'float':
+                    case 'duration':
+                      fallbackValue = '0';
+                      break;
+                    case 'boolean':
+                      fallbackValue = 'false';
+                      break;
+                    case 'string':
+                    case 'directedPair':
+                    case 'identifier':
+                    case 'pair':
+                    case 'record':
+                    default:
+                      fallbackValue = '';
+                      break;
+                  }
+
+                  const defaultValue = v.defaultValue ?? fallbackValue;
+
+                  if (Array.isArray(v.value)) {
+                    const dv = Array.isArray(defaultValue) ? defaultValue : [defaultValue];
+                    return v.value.length === dv.length && v.value.every((val, i) => val === dv[i]);
+                  }
+
+                  return v.value === defaultValue;
+                });
+
                 // Computed and opiniated
                 // const type = item.categories.includes(this.configContext?.infoItemCategory) ? 'info' : 'regular';
                 // const correct = (type == 'regular' && score !== undefined && !isNaN(score) && score > 0) || false;
@@ -425,6 +484,8 @@ export class TestNavigation extends LitElement {
                   index,
                   // type,
                   active,
+                  valid,
+                  isDefaultResponse,
                   // correct,
                   maxScore
                   // incorrect,
