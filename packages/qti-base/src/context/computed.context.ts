@@ -9,6 +9,8 @@ export type ComputedItem = ComputedItemContext & {
   index?: number;
   active?: boolean;
   allowSkipping?: boolean;
+  maxAttempts?: number;
+  numAttempts?: number;
   valid?: boolean;
   isDefaultResponse?: boolean;
 };
