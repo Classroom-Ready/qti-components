@@ -55,7 +55,21 @@ export class TestEndAttempt extends LitElement {
     const itemIndex = sectionItems.findIndex(item => item.active);
     const activeItem = sectionItems[itemIndex];
 
-    if (activeItem && activeItem.allowSkipping === false) {
+    if (!activeItem) {
+      this._internalDisabled = false;
+      return;
+    }
+
+    const maxAttempts = activeItem.maxAttempts ?? 1;
+    const numAttempts = activeItem.numAttempts || 0;
+
+    // For non-adaptive items, disable when max attempts have been reached
+    if (!activeItem.adaptive && maxAttempts > 0 && numAttempts >= maxAttempts) {
+      this._internalDisabled = true;
+      return;
+    }
+
+    if (activeItem.allowSkipping === false) {
       this._internalDisabled = activeItem.valid === false || activeItem.isDefaultResponse;
     } else {
       this._internalDisabled = false;

@@ -235,6 +235,7 @@ export class TestNavigation extends LitElement {
           ':scope > qti-item-session-control'
         );
         const partAllowSkipping = testPartSessionControl ? testPartSessionControl.allowSkipping : true;
+        const partMaxAttempts = testPartSessionControl ? testPartSessionControl.maxAttempts : 1;
         return {
           active: false,
           identifier: testPart.identifier,
@@ -249,6 +250,7 @@ export class TestNavigation extends LitElement {
             const sectionAllowSkipping = sectionSessionControl
               ? sectionSessionControl.allowSkipping
               : partAllowSkipping;
+            const sectionMaxAttempts = sectionSessionControl ? sectionSessionControl.maxAttempts : partMaxAttempts;
             return {
               active: false,
               identifier: section.identifier,
@@ -261,6 +263,7 @@ export class TestNavigation extends LitElement {
                   ':scope > qti-item-session-control'
                 );
                 const itemAllowSkipping = itemSessionControl ? itemSessionControl.allowSkipping : sectionAllowSkipping;
+                const itemMaxAttempts = itemSessionControl ? itemSessionControl.maxAttempts : sectionMaxAttempts;
                 return {
                   ...this.initContext?.find(i => i.identifier === item.identifier),
                   active: false,
@@ -268,7 +271,8 @@ export class TestNavigation extends LitElement {
                   categories: item.category ? item.category?.split(' ') : [],
                   href: item.href,
                   variables: [] as OutcomeVariable[],
-                  allowSkipping: itemAllowSkipping
+                  allowSkipping: itemAllowSkipping,
+                  maxAttempts: itemMaxAttempts
                 };
               })
             };
@@ -419,7 +423,8 @@ export class TestNavigation extends LitElement {
                   ?.value as string;
 
                 const response = computedItem.variables?.find(v => v.identifier === 'RESPONSE')?.value || '';
-                const numAttempts = computedItem.variables?.find(v => v.identifier === 'numAttempts')?.value || 0;
+                const numAttempts =
+                  Number(computedItem.variables?.find(v => v.identifier === 'numAttempts')?.value) || 0;
 
                 const active = this._sessionContext?.navItemRefId === computedItem.identifier || false;
 

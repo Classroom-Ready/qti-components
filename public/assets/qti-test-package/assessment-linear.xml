@@ -7,8 +7,6 @@
         xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
 >
     <qti-test-part identifier="test-part-1" navigation-mode="linear" submission-mode="individual">
-
-
         <qti-assessment-section identifier="info-start" title="start" visible="true">
             <qti-assessment-item-ref identifier="ITM-info_start" href="items/info_start.xml"
                                      category="info" />
