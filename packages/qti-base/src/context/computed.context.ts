@@ -10,6 +10,7 @@ export type ComputedItem = ComputedItemContext & {
   active?: boolean;
   allowSkipping?: boolean;
   maxAttempts?: number;
+  showFeedback?: boolean;
   numAttempts?: number;
   valid?: boolean;
   isDefaultResponse?: boolean;
