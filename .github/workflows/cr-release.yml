@@ -1,0 +1,98 @@
+name: "Release: Classroom Ready (auto-bump + asset)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Semver bump applied to the latest vX.Y.Z-cr tag"
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout classroomready branch
+        uses: actions/checkout@v5
+        with:
+          ref: classroomready
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Compute next version
+        id: ver
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUMP: ${{ inputs.bump }}
+        run: |
+          set -euo pipefail
+          latest=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName \
+            --jq '[.[].tagName | select(test("^v[0-9]+\\.[0-9]+\\.[0-9]+-cr$"))] | first // empty')
+          if [ -z "$latest" ]; then
+            latest="v0.0.0-cr"
+          fi
+          base=${latest#v}
+          base=${base%-cr}
+          IFS=. read -r major minor patch <<<"$base"
+          case "$BUMP" in
+            major) major=$((major+1)); minor=0; patch=0 ;;
+            minor) minor=$((minor+1)); patch=0 ;;
+            patch) patch=$((patch+1)) ;;
+            *) echo "unknown bump: $BUMP" >&2; exit 1 ;;
+          esac
+          next="${major}.${minor}.${patch}"
+          tag="v${next}-cr"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Latest CR tag: ${latest} -> ${tag}"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set umbrella package version (in-tree only)
+        run: |
+          node -e "const fs=require('fs');const p='packages/qti-components/package.json';const j=JSON.parse(fs.readFileSync(p));j.version='${{ steps.ver.outputs.next }}';fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');"
+
+      - name: Build workspace
+        run: pnpm run build
+
+      - name: Pack umbrella package
+        id: pack
+        working-directory: packages/qti-components
+        run: |
+          set -euo pipefail
+          pnpm pack --pack-destination "$RUNNER_TEMP"
+          tarball=$(ls -1 "$RUNNER_TEMP"/*.tgz | head -n1)
+          if [ -z "$tarball" ] || [ ! -f "$tarball" ]; then
+            echo "pnpm pack produced no tarball" >&2
+            exit 1
+          fi
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+          ls -la "$tarball"
+
+      - name: Create release with asset attached
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.ver.outputs.tag }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target classroomready \
+            --title "Classroom Ready ${{ steps.ver.outputs.tag }}" \
+            --notes "Automated CR release built from the classroomready branch. Bump: ${{ inputs.bump }}." \
+            "${{ steps.pack.outputs.tarball }}"
