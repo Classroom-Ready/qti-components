@@ -41754,6 +41754,43 @@
             },
             {
               "kind": "method",
+              "name": "#announceCompletionTransitions",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "After computedContext has been rebuilt, fire one-shot transition events\nthe first time each test-part — and the test as a whole — becomes done.\nDownstream listeners (test-processing.mixin) run outcomeProcessing in\nresponse so atEnd feedback can evaluate."
+            },
+            {
+              "kind": "method",
+              "name": "#assessCorrectness",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "'unknown' | 'correct' | 'incorrect'"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "ItemContext"
+                  }
+                }
+              ],
+              "description": "Compare current response values to their declared qti-correct-response.\nBookkeeping variables like numAttempts can be typed 'response' but never\ndeclare a correctResponse, so filter on declared correctResponse.\nReturns 'unknown' for items without any judgeable response (essays, etc.)."
+            },
+            {
+              "kind": "field",
+              "name": "#endedParts",
+              "privacy": "private",
+              "default": "new Set<string>()",
+              "description": "Test-parts whose end-of-part transition has already been announced."
+            },
+            {
+              "kind": "method",
               "name": "#extractDefaultValues",
               "privacy": "private",
               "return": {
@@ -41875,12 +41912,53 @@
               ]
             },
             {
+              "kind": "method",
+              "name": "#isItemDone",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "numAttempts",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "itemContext",
+                  "type": {
+                    "text": "ItemContext | undefined"
+                  }
+                },
+                {
+                  "name": "maxAttempts",
+                  "type": {
+                    "text": "number | undefined"
+                  }
+                }
+              ],
+              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, we treat the submission as their final answer unless we\n  can prove the answer is wrong AND there are attempts left. We can only\n  prove \"wrong\" when the item declares a qti-correct-response."
+            },
+            {
               "kind": "field",
               "name": "#testElement",
               "privacy": "private",
               "type": {
                 "text": "QtiAssessmentTest"
               }
+            },
+            {
+              "kind": "field",
+              "name": "#testEnded",
+              "privacy": "private",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the end-of-test transition has already been announced."
             },
             {
               "kind": "field",
@@ -41942,6 +42020,18 @@
           "events": [
             {
               "name": "qti-computed-context-updated",
+              "type": {
+                "text": "CustomEvent"
+              }
+            },
+            {
+              "name": "qti-part-completed",
+              "type": {
+                "text": "CustomEvent"
+              }
+            },
+            {
+              "name": "qti-test-completed",
               "type": {
                 "text": "CustomEvent"
               }
