@@ -37414,6 +37414,25 @@
           "name": "QtiPrintedVariable",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected"
+            },
+            {
+              "kind": "method",
+              "name": "#closestVariable",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "description": "Resolve the variable from the closest available scope: item-level first,\nthen test-level outcome variables. This lets the element work both inside\nqti-feedback-block (item scope) and qti-test-feedback (test scope)."
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -40176,6 +40195,22 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/qti-test/src/components/qti-outcome-processing/qti-outcome-processing"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/qti-test/src/components/qti-test-variables/qti-test-variables"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/qti-test/src/components/qti-item-session-control/qti-item-session-control"
           }
         },
@@ -40676,6 +40711,11 @@
             },
             {
               "kind": "field",
+              "name": "#handleTestOutcomeChanged",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
               "name": "#title",
               "privacy": "private",
               "type": {
@@ -41034,6 +41074,22 @@
               }
             },
             {
+              "kind": "field",
+              "name": "_sessionContext",
+              "type": {
+                "text": "SessionContext | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "private"
+            },
+            {
               "kind": "method",
               "name": "#sessionControlAllowsFeedback",
               "privacy": "private",
@@ -41065,6 +41121,20 @@
               }
             },
             {
+              "kind": "field",
+              "name": "access",
+              "type": {
+                "text": "TestFeedbackAccess"
+              },
+              "privacy": "public",
+              "default": "'atEnd'",
+              "description": "Per QTI 3 spec, controls when test feedback is presented.\n- \"atEnd\": shown only at the conclusion of the test or test part.\n- \"during\": shown while the test is still in progress, after each\n  instance of outcome processing.",
+              "attribute": "access",
+              "parsedType": {
+                "text": "'atEnd' | 'during'"
+              }
+            },
+            {
               "kind": "method",
               "name": "checkShowFeedback",
               "privacy": "public",
@@ -41074,14 +41144,26 @@
                   "type": {
                     "text": "string"
                   }
+                },
+                {
+                  "name": "options",
+                  "default": "{}",
+                  "type": {
+                    "text": "{ atEnd?: boolean; partId?: string | null }"
+                  }
                 }
               ],
               "inheritedFrom": {
                 "name": "QtiFeedback",
                 "module": "packages/qti-base/src/abstract/qti-feedback.ts"
               },
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
               "type": {
-                "text": "checkShowFeedback(outcomeIdentifier: string) => void"
+                "text": "checkShowFeedback(outcomeIdentifier: string, options: { atEnd?: boolean; partId?: string | null } = {}) => void"
               }
             },
             {
@@ -41159,13 +41241,19 @@
               }
             }
           ],
-          "superclass": {
-            "name": "QtiModalFeedback",
-            "package": "@qti-components/elements"
-          },
-          "tagName": "qti-test-feedback",
-          "customElement": true,
           "attributes": [
+            {
+              "name": "access",
+              "type": {
+                "text": "TestFeedbackAccess"
+              },
+              "default": "'atEnd'",
+              "description": "Per QTI 3 spec, controls when test feedback is presented.\n- \"atEnd\": shown only at the conclusion of the test or test part.\n- \"during\": shown while the test is still in progress, after each\n  instance of outcome processing.",
+              "fieldName": "access",
+              "parsedType": {
+                "text": "'atEnd' | 'during'"
+              }
+            },
             {
               "name": "identifier",
               "type": {
@@ -41201,6 +41289,12 @@
               }
             }
           ],
+          "superclass": {
+            "name": "QtiModalFeedback",
+            "package": "@qti-components/elements"
+          },
+          "tagName": "qti-test-feedback",
+          "customElement": true,
           "events": [
             {
               "name": "qti-register-feedback",
@@ -41399,11 +41493,13 @@
               "privacy": "public"
             },
             {
-              "kind": "field",
-              "name": "#testElement",
+              "kind": "method",
+              "name": "#findTestElement",
               "privacy": "private",
-              "type": {
-                "text": "QtiAssessmentTest"
+              "return": {
+                "type": {
+                  "text": "QtiAssessmentTest | null"
+                }
               }
             },
             {
@@ -41723,6 +41819,25 @@
               "privacy": "private"
             },
             {
+              "kind": "method",
+              "name": "#setTestDoc",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "testDoc",
+                  "type": {
+                    "text": "DocumentFragment"
+                  }
+                }
+              ],
+              "description": "Assign the new testDoc and announce it upstream. The event fires\nsynchronously after the assignment; Lit's re-render is async, so handlers\ncan still wipe state before children of the new qti-assessment-test start\nconnecting and dispatching their own events."
+            },
+            {
               "kind": "field",
               "name": "#templateContent",
               "privacy": "private",
@@ -41770,6 +41885,14 @@
               },
               "default": "null",
               "description": "The raw XML string"
+            }
+          ],
+          "events": [
+            {
+              "name": "qti-testdoc-loaded",
+              "type": {
+                "text": "CustomEvent"
+              }
             }
           ],
           "attributes": [
@@ -42023,6 +42146,43 @@
             },
             {
               "kind": "method",
+              "name": "#announceCompletionTransitions",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "After computedContext has been rebuilt, fire one-shot transition events\nthe first time each test-part — and the test as a whole — becomes done.\nDownstream listeners (test-processing.mixin) run outcomeProcessing in\nresponse so atEnd feedback can evaluate."
+            },
+            {
+              "kind": "method",
+              "name": "#assessCorrectness",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "'unknown' | 'correct' | 'incorrect'"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": {
+                    "text": "ItemContext"
+                  }
+                }
+              ],
+              "description": "Compare current response values to their declared qti-correct-response.\nBookkeeping variables like numAttempts can be typed 'response' but never\ndeclare a correctResponse, so filter on declared correctResponse.\nReturns 'unknown' for items without any judgeable response (essays, etc.)."
+            },
+            {
+              "kind": "field",
+              "name": "#endedParts",
+              "privacy": "private",
+              "default": "new Set<string>()",
+              "description": "Test-parts whose end-of-part transition has already been announced."
+            },
+            {
+              "kind": "method",
               "name": "#extractDefaultValues",
               "privacy": "private",
               "return": {
@@ -42144,12 +42304,53 @@
               ]
             },
             {
+              "kind": "method",
+              "name": "#isItemDone",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "numAttempts",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "itemContext",
+                  "type": {
+                    "text": "ItemContext | undefined"
+                  }
+                },
+                {
+                  "name": "maxAttempts",
+                  "type": {
+                    "text": "number | undefined"
+                  }
+                }
+              ],
+              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, we treat the submission as their final answer unless we\n  can prove the answer is wrong AND there are attempts left. We can only\n  prove \"wrong\" when the item declares a qti-correct-response."
+            },
+            {
               "kind": "field",
               "name": "#testElement",
               "privacy": "private",
               "type": {
                 "text": "QtiAssessmentTest"
               }
+            },
+            {
+              "kind": "field",
+              "name": "#testEnded",
+              "privacy": "private",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the end-of-test transition has already been announced."
             },
             {
               "kind": "field",
@@ -42211,6 +42412,18 @@
           "events": [
             {
               "name": "qti-computed-context-updated",
+              "type": {
+                "text": "CustomEvent"
+              }
+            },
+            {
+              "name": "qti-part-completed",
+              "type": {
+                "text": "CustomEvent"
+              }
+            },
+            {
+              "name": "qti-test-completed",
               "type": {
                 "text": "CustomEvent"
               }

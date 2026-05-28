@@ -14,6 +14,7 @@ export type ComputedItem = ComputedItemContext & {
   numAttempts?: number;
   valid?: boolean;
   isDefaultResponse?: boolean;
+  done?: boolean;
 };
 
 export type ComputedContext = {
