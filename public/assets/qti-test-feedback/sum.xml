@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<qti-assessment-test
+  xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0_v1p0.xsd"
+  identifier="TEST-feedback-sum"
+  title="Linear individual test with summed atEnd feedback">
+
+  <qti-outcome-declaration identifier="TEST_SCORE" base-type="float" cardinality="single">
+    <qti-default-value>
+      <qti-value>0</qti-value>
+    </qti-default-value>
+  </qti-outcome-declaration>
+  <qti-outcome-declaration identifier="TEST_MAX_SCORE" base-type="float" cardinality="single">
+    <qti-default-value>
+      <qti-value>0</qti-value>
+    </qti-default-value>
+  </qti-outcome-declaration>
+  <qti-outcome-declaration identifier="TEST_RESULT" base-type="identifier" cardinality="single"/>
+
+  <qti-test-part identifier="TP-1" navigation-mode="linear" submission-mode="individual">
+    <qti-assessment-section identifier="S-1" title="Section" visible="true">
+      <qti-assessment-item-ref identifier="Q1" href="q-1pt.xml"/>
+      <qti-assessment-item-ref identifier="Q2" href="q-2pt.xml"/>
+    </qti-assessment-section>
+  </qti-test-part>
+
+  <qti-outcome-processing>
+    <qti-set-outcome-value identifier="TEST_SCORE">
+      <qti-sum>
+        <qti-test-variables variable-identifier="SCORE"/>
+      </qti-sum>
+    </qti-set-outcome-value>
+    <qti-set-outcome-value identifier="TEST_MAX_SCORE">
+      <qti-sum>
+        <qti-test-variables variable-identifier="MAXSCORE"/>
+      </qti-sum>
+    </qti-set-outcome-value>
+    <qti-set-outcome-value identifier="TEST_RESULT">
+      <qti-base-value base-type="identifier">RESULT</qti-base-value>
+    </qti-set-outcome-value>
+  </qti-outcome-processing>
+
+  <qti-test-feedback identifier="RESULT" outcome-identifier="TEST_RESULT" show-hide="show" access="atEnd">
+    <qti-content-body>
+      <p>Total: <qti-printed-variable identifier="TEST_SCORE"></qti-printed-variable>/<qti-printed-variable identifier="TEST_MAX_SCORE"></qti-printed-variable> correct</p>
+    </qti-content-body>
+  </qti-test-feedback>
+</qti-assessment-test>

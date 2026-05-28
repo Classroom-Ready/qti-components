@@ -1,11 +1,10 @@
 import { consume } from '@lit/context';
-import { LitElement, html, nothing } from 'lit';
+import { html, LitElement, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
 
-import { itemContext } from '@qti-components/base';
+import { itemContext, testContext } from '@qti-components/base';
 
-import type { VariableDeclaration } from '@qti-components/base';
-import type { ItemContext } from '@qti-components/base';
+import type { ItemContext, TestContext, VariableDeclaration } from '@qti-components/base';
 
 export class QtiPrintedVariable extends LitElement {
   @property({ type: String })
@@ -15,14 +14,29 @@ export class QtiPrintedVariable extends LitElement {
   @state()
   protected context?: ItemContext;
 
+  @consume({ context: testContext, subscribe: true })
+  @state()
+  protected _testContext?: TestContext;
+
   override render() {
-    const value = this.context?.variables.find(v => v.identifier === this.identifier)?.value;
-    return value === null ? nothing : html`${JSON.stringify(value, null, 2)}`;
+    const value = this.#closestVariable()?.value;
+    if (value === null || value === undefined) return nothing;
+    return html`${Array.isArray(value) ? value.join(' ') : value}`;
   }
 
   public calculate(): VariableDeclaration<string | string[]> {
-    const result = this.context.variables.find(v => v.identifier === this.identifier) || null;
-    return result;
+    return this.#closestVariable() ?? null;
+  }
+
+  /**
+   * Resolve the variable from the closest available scope: item-level first,
+   * then test-level outcome variables. This lets the element work both inside
+   * qti-feedback-block (item scope) and qti-test-feedback (test scope).
+   */
+  #closestVariable(): VariableDeclaration<string | string[] | null> | null {
+    const itemVariable = this.context?.variables.find(v => v.identifier === this.identifier);
+    if (itemVariable) return itemVariable;
+    return this._testContext?.testOutcomeVariables?.find(v => v.identifier === this.identifier) ?? null;
   }
 }
 

@@ -6,9 +6,12 @@ import { computedContext, configContext, qtiContext, sessionContext, testContext
 
 import type {
   ComputedContext,
+  ComputedItem,
   ConfigContext,
+  ItemContext,
   OutcomeVariable,
   QtiContext,
+  ResponseVariable,
   SessionContext,
   TestContext
 } from '@qti-components/base';
@@ -23,6 +26,8 @@ import type { QtiItemSessionControl } from '../qti-item-session-control/qti-item
 type CustomEventMap = {
   'test-end-attempt': CustomEvent;
   'test-show-correct-response': CustomEvent<{ value: boolean }>;
+  'qti-part-completed': CustomEvent<{ partId: string }>;
+  'qti-test-completed': CustomEvent;
 };
 
 declare global {
@@ -66,6 +71,11 @@ export class TestNavigation extends LitElement {
 
   #testElement: QtiAssessmentTest;
 
+  /** Test-parts whose end-of-part transition has already been announced. */
+  #endedParts = new Set<string>();
+  /** Whether the end-of-test transition has already been announced. */
+  #testEnded = false;
+
   constructor() {
     super();
     this.addEventListener('qti-assessment-test-connected', this.#handleTestConnected.bind(this));
@@ -77,6 +87,11 @@ export class TestNavigation extends LitElement {
     this.addEventListener('test-show-correct-response', this.#handleTestShowCorrectResponse.bind(this));
     this.addEventListener('test-show-candidate-correction', this.#handleTestShowCandidateCorrection.bind(this));
     this.addEventListener('test-update-outcome-variable', this.#handleTestUpdateOutcomeVariable.bind(this));
+    // A fresh test invalidates the per-test completion latches.
+    this.addEventListener('qti-testdoc-loaded', () => {
+      this.#endedParts.clear();
+      this.#testEnded = false;
+    });
   }
 
   /**
@@ -448,6 +463,8 @@ export class TestNavigation extends LitElement {
                 const maxScore =
                   rawMaxScore === undefined || rawMaxScore === null ? null : parseFloat(rawMaxScore?.toString());
 
+                const done = this.#isItemDone(numAttempts, itemContext, computedItem.maxAttempts);
+
                 return {
                   ...computedItem,
                   completionStatus,
@@ -458,7 +475,8 @@ export class TestNavigation extends LitElement {
                   active,
                   valid,
                   isDefaultResponse,
-                  maxScore
+                  maxScore,
+                  done
                   // type,
                   // correct,
                   // incorrect,
@@ -471,11 +489,90 @@ export class TestNavigation extends LitElement {
       })
     };
 
+    this.#announceCompletionTransitions();
+
     this.dispatchEvent(
       new CustomEvent('qti-computed-context-updated', {
         detail: this.computedContext,
         bubbles: true
       })
     );
+  }
+
+  /**
+   * Decide whether an item should be treated as "the candidate is done with it"
+   * for the purpose of firing end-of-part / end-of-test outcome processing.
+   *
+   * - Info items don't require submission.
+   * - Otherwise the candidate must have actually ended an attempt (numAttempts > 0).
+   * - Once attempted, we treat the submission as their final answer unless we
+   *   can prove the answer is wrong AND there are attempts left. We can only
+   *   prove "wrong" when the item declares a qti-correct-response.
+   */
+  #isItemDone(numAttempts: number, itemContext: ItemContext | undefined, maxAttempts: number | undefined): boolean {
+    if (numAttempts === 0) return false;
+    const correctness = itemContext ? this.#assessCorrectness(itemContext) : 'unknown';
+    if (correctness !== 'incorrect') return true;
+    const max = maxAttempts ?? 1;
+    return max > 0 && numAttempts >= max;
+  }
+
+  /**
+   * Compare current response values to their declared qti-correct-response.
+   * Bookkeeping variables like numAttempts can be typed 'response' but never
+   * declare a correctResponse, so filter on declared correctResponse.
+   * Returns 'unknown' for items without any judgeable response (essays, etc.).
+   */
+  #assessCorrectness(item: ItemContext): 'unknown' | 'correct' | 'incorrect' {
+    const responseVars = (item.variables ?? []).filter(
+      (v): v is ResponseVariable =>
+        v.type === 'response' &&
+        (v as ResponseVariable).correctResponse !== undefined &&
+        (v as ResponseVariable).correctResponse !== null
+    );
+    if (responseVars.length === 0) return 'unknown';
+    const allMatch = responseVars.every(v => {
+      const expected = v.correctResponse;
+      const actual = v.value;
+      if (actual === undefined || actual === null) return false;
+      if (Array.isArray(expected) && Array.isArray(actual)) {
+        return expected.length === actual.length && expected.every(e => actual.includes(e));
+      }
+      if (Array.isArray(expected) || Array.isArray(actual)) return false;
+      return expected === actual;
+    });
+    return allMatch ? 'correct' : 'incorrect';
+  }
+
+  /**
+   * After computedContext has been rebuilt, fire one-shot transition events
+   * the first time each test-part — and the test as a whole — becomes done.
+   * Downstream listeners (test-processing.mixin) run outcomeProcessing in
+   * response so atEnd feedback can evaluate.
+   */
+  #announceCompletionTransitions(): void {
+    const partsWithItems = this.computedContext.testParts.filter(p => p.sections.some(s => s.items.length > 0));
+    for (const part of partsWithItems) {
+      if (this.#endedParts.has(part.identifier)) continue;
+      const allDone = part.sections.flatMap(s => s.items).every((i: ComputedItem) => i.done === true);
+      if (!allDone) continue;
+      this.#endedParts.add(part.identifier);
+      this.dispatchEvent(
+        new CustomEvent('qti-part-completed', {
+          detail: { partId: part.identifier },
+          bubbles: true,
+          composed: true
+        })
+      );
+    }
+
+    if (
+      !this.#testEnded &&
+      partsWithItems.length > 0 &&
+      partsWithItems.every(p => this.#endedParts.has(p.identifier))
+    ) {
+      this.#testEnded = true;
+      this.dispatchEvent(new CustomEvent('qti-test-completed', { bubbles: true, composed: true }));
+    }
   }
 }
