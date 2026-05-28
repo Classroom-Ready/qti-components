@@ -70,7 +70,7 @@ export class TestContainer extends LitElement {
         }
       }
 
-      this.testDoc = api.htmlDoc();
+      this.#setTestDoc(api.htmlDoc());
     } catch (error) {
       console.error('Error loading or parsing XML:', error);
     }
@@ -80,10 +80,26 @@ export class TestContainer extends LitElement {
   protected handleTestXMLChange() {
     if (!this.testXML) return;
     try {
-      this.testDoc = qtiTransformTest().parse(this.testXML).htmlDoc();
+      this.#setTestDoc(qtiTransformTest().parse(this.testXML).htmlDoc());
     } catch (error) {
       console.error('Error parsing XML:', error);
     }
+  }
+
+  /**
+   * Assign the new testDoc and announce it upstream. The event fires
+   * synchronously after the assignment; Lit's re-render is async, so handlers
+   * can still wipe state before children of the new qti-assessment-test start
+   * connecting and dispatching their own events.
+   */
+  #setTestDoc(testDoc: DocumentFragment): void {
+    this.testDoc = testDoc;
+    this.dispatchEvent(
+      new CustomEvent('qti-testdoc-loaded', {
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   override async connectedCallback(): Promise<void> {

@@ -69,3 +69,22 @@ export async function getAssessmentItemFromTestContainerByDataTitle(
   }
   return null;
 }
+
+/**
+ * Resolve the loaded qti-assessment-item for a given qti-assessment-item-ref
+ * identifier. Use this (instead of by data-title) when several item-refs may
+ * point at the same item file and share a title.
+ */
+export async function getAssessmentItemFromTestContainerByItemRefId(
+  canvasElement: HTMLElement,
+  itemRefId: string
+): Promise<HTMLElement | null> {
+  return waitFor(() => {
+    const testContainer = canvasElement.querySelector('test-container');
+    const itemRef = testContainer?.shadowRoot?.querySelector(`qti-assessment-item-ref[identifier="${itemRefId}"]`);
+    const item = itemRef?.querySelector('qti-assessment-item');
+    if (!item)
+      throw new Error(`qti-assessment-item under qti-assessment-item-ref[identifier="${itemRefId}"] not ready`);
+    return item as HTMLElement;
+  });
+}

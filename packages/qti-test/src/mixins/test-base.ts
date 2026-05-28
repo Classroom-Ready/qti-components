@@ -60,14 +60,20 @@ export const TestBaseMixin = <T extends Constructor<LitElement>>(superClass: T) 
 
     private _initializeEventListeners(): void {
       /**
-       * When the test is connected, the items are updated in the test context.
-       * An existing context item is updated with the itemRef properties if nessesary.
+       * Reset context on test load.
+       */
+      this.addEventListener('qti-testdoc-loaded', () => {
+        this.testContext = INITIAL_TEST_CONTEXT;
+        this.sessionContext = INITIAL_SESSION_CONTEXT;
+        this._testElement = null;
+      });
+
+      /**
+       * When the test is connected, the items are added to the test context.
+       * Registrations from children have already filled in
+       * testOutcomeVariables on the just-reset context above.
        */
       this.addEventListener('qti-assessment-test-connected', (e: CustomEvent<QtiAssessmentTest>) => {
-        this.testContext = INITIAL_TEST_CONTEXT; // new test, new test context!
-        this.sessionContext = INITIAL_SESSION_CONTEXT; // new test, new session context!
-        if (this.testContext && this.testContext.items.length > 0) return;
-
         this._testElement = e.detail;
         const items = Array.from(this._testElement.querySelectorAll('qti-assessment-item-ref')).map(itemRef => {
           return {
