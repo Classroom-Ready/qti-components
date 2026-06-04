@@ -86,9 +86,22 @@ jobs:
           echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
           ls -la "$tarball"
 
+      # Mint a GitHub App token so the release is NOT created by the default
+      # GITHUB_TOKEN. Releases published by GITHUB_TOKEN do not trigger other
+      # workflows (GitHub's recursion guard), which would stop
+      # notify-frontend-release.yml from firing. The app already has
+      # contents: write despite its "reader" name.
+      - name: Get token from GitHub App
+        uses: actions/create-github-app-token@v3
+        id: app_token
+        with:
+          client-id: ${{ vars.REPO_READONLY_GITHUB_APP_CLIENT_ID }}
+          private-key: ${{ secrets.REPO_READONLY_GITHUB_APP_KEY }}
+          owner: ${{ github.repository_owner }}
+
       - name: Create release with asset attached
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
         run: |
           gh release create "${{ steps.ver.outputs.tag }}" \
             --repo "$GITHUB_REPOSITORY" \
