@@ -1,9 +1,37 @@
 const xml = String.raw;
 const html = String.raw;
 
+import { afterEach, vi } from 'vitest';
+
 import { qtiTransformItem } from '../src/qti-transform-item';
 
+const shuffledLoadItem = xml`
+  <qti-assessment-item identifier="ITM-LOAD">
+    <qti-item-body>
+      <qti-choice-interaction response-identifier="RESPONSE" shuffle="true">
+        <qti-simple-choice identifier="A">Optie A</qti-simple-choice>
+        <qti-simple-choice identifier="B">Optie B</qti-simple-choice>
+        <qti-simple-choice identifier="C">Optie C</qti-simple-choice>
+        <qti-simple-choice identifier="D">Optie D</qti-simple-choice>
+      </qti-choice-interaction>
+    </qti-item-body>
+  </qti-assessment-item>`;
+
+const choiceIdentifiers = (doc: XMLDocument): string[] =>
+  Array.from(doc.querySelectorAll('qti-simple-choice')).map(choice => choice.getAttribute('identifier') ?? '');
+
+const mockXmlFetch = (body: string) => {
+  const fetchMock = vi.fn(async () => new Response(body, { status: 200 }));
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+};
+
 describe('qtiTransformItem API Methods', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    sessionStorage.clear();
+  });
+
   it('should apply customInteraction correctly', async () => {
     const parsedXML = qtiTransformItem()
       .parse(
@@ -153,9 +181,7 @@ describe('qtiTransformItem API Methods', () => {
   });
 
   it('choice should shuffle', async () => {
-    const parsedXML = qtiTransformItem()
-      .parse(
-        xml`
+    const sourceXml = xml`
         <qti-assessment-item>
           <qti-item-body>
             <qti-choice-interaction shuffle="true">
@@ -164,22 +190,34 @@ describe('qtiTransformItem API Methods', () => {
               <qti-simple-choice identifier="C">Optie C</qti-simple-choice>
             </qti-choice-interaction>
           </qti-item-body>
-        </qti-assessment-item>`
-      )
-      .shuffleInteractions()
-      .html();
-
-    expect(parsedXML).not.toEqualXml(
-      html`<qti-assessment-item>
-        <qti-item-body>
-          <qti-choice-interaction shuffle="true">
-            <qti-simple-choice identifier="A">Optie A</qti-simple-choice>
-            <qti-simple-choice identifier="B">Optie B</qti-simple-choice>
-            <qti-simple-choice identifier="C">Optie C</qti-simple-choice>
-          </qti-choice-interaction>
-        </qti-item-body>
-      </qti-assessment-item>`
+        </qti-assessment-item>`;
+    const original = ['A', 'B', 'C'];
+    const shuffledOrders = [0, 1, 2, 3, 4].map(seed =>
+      choiceIdentifiers(qtiTransformItem().parse(sourceXml).shuffleInteractions(seed).xmlDoc())
     );
+
+    expect(shuffledOrders.some(order => JSON.stringify(order) !== JSON.stringify(original))).toBe(true);
+  });
+
+  it('does not shuffle interactions on load by default', async () => {
+    mockXmlFetch(shuffledLoadItem);
+
+    const transformer = await qtiTransformItem().load('/item.xml');
+    const interaction = transformer.xmlDoc().querySelector('qti-choice-interaction');
+
+    expect(choiceIdentifiers(transformer.xmlDoc())).toEqual(['A', 'B', 'C', 'D']);
+    expect(interaction?.getAttribute('shuffle')).toBe('true');
+  });
+
+  it('applies deterministic shuffle when explicitly chained after load', async () => {
+    const fetchMock = mockXmlFetch(shuffledLoadItem);
+
+    const first = (await qtiTransformItem().load('/item.xml')).shuffleInteractions('seeded-load');
+    const second = (await qtiTransformItem().load('/item.xml')).shuffleInteractions('seeded-load');
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(first.xmlDoc().querySelector('qti-choice-interaction')?.hasAttribute('shuffle')).toBe(false);
+    expect(choiceIdentifiers(first.xmlDoc())).toEqual(choiceIdentifiers(second.xmlDoc()));
   });
 
   it('shuffle fixed p1', async () => {
