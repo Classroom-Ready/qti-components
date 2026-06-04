@@ -1,0 +1,45 @@
+# Notifies Classroom-Ready/classroomready_frontend whenever a release is
+# published here, so it can bump its `@citolab/qti-components` dependency
+# instantly instead of waiting for its daily poll.
+#
+# Posts a `repository_dispatch` of type `qti-components-release`, consumed by
+# `.github/workflows/update-qti-version.yml` in the frontend repo.
+#
+# Auth: uses the org's GitHub App (same client-id/key as the frontend's
+# lint/update workflows).
+
+name: Notify frontend of release
+
+on:
+  release:
+    types: [published]
+
+permissions: {}
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    # Only the `*-cr` releases matter to the frontend; skip anything else.
+    if: ${{ endsWith(github.event.release.tag_name, '-cr') }}
+    steps:
+      - name: Get token from GitHub App
+        uses: actions/create-github-app-token@v3
+        id: app_token
+        with:
+          client-id: ${{ vars.REPO_READONLY_GITHUB_APP_CLIENT_ID }}
+          private-key: ${{ secrets.REPO_READONLY_GITHUB_APP_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: classroomready_frontend
+
+      - name: POST qti-components-release dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ steps.app_token.outputs.token }}
+          repository: ${{ github.repository_owner }}/classroomready_frontend
+          event-type: qti-components-release
+          client-payload: |
+            {
+              "tag": "${{ github.event.release.tag_name }}",
+              "release_url": "${{ github.event.release.html_url }}",
+              "source_repo": "${{ github.repository }}"
+            }
