@@ -124,9 +124,7 @@ export class TestNavigation extends LitElement {
    * processResponse — fired by test-end-attempt, autoscore, or an in-item
    * end-attempt interaction — flags its context update with `responseProcessed`;
    * a plain selection updates the context without it, so `done` can't flip until
-   * the candidate actually ends the attempt. The event carries the freshly
-   * processed context (with each response's qti-correct-response), so judging it
-   * needs no SCORE outcome.
+   * the candidate actually ends the attempt.
    */
   #handleItemContextUpdated(event: CustomEvent<{ itemContext: ItemContext; responseProcessed?: boolean }>) {
     if (!event.detail?.responseProcessed) return;

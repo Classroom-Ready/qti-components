@@ -42273,7 +42273,7 @@
                   }
                 }
               ],
-              "description": "Latch an item's correctness whenever it has just ended an attempt.\nprocessResponse — fired by test-end-attempt, autoscore, or an in-item\nend-attempt interaction — flags its context update with `responseProcessed`;\na plain selection updates the context without it, so `done` can't flip until\nthe candidate actually ends the attempt. The event carries the freshly\nprocessed context (with each response's qti-correct-response), so judging it\nneeds no SCORE outcome."
+              "description": "Latch an item's correctness whenever it has just ended an attempt.\nprocessResponse — fired by test-end-attempt, autoscore, or an in-item\nend-attempt interaction — flags its context update with `responseProcessed`;\na plain selection updates the context without it, so `done` can't flip until\nthe candidate actually ends the attempt."
             },
             {
               "kind": "method",
