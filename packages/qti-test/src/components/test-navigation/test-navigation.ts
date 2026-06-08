@@ -34,6 +34,13 @@ declare global {
   interface GlobalEventHandlersEventMap extends CustomEventMap {}
 }
 
+/**
+ * Whether an item's ended attempt reached the best achievable outcome:
+ * 'optimal' (nothing to improve), 'suboptimal' (a better attempt is possible),
+ * or 'unscored' (no machine-judgeable optimal value — see #assessOptimality).
+ */
+type ItemOptimality = 'optimal' | 'suboptimal' | 'unscored';
+
 @customElement('test-navigation')
 export class TestNavigation extends LitElement {
   @property({ type: String }) identifier: string | undefined = undefined;
@@ -82,7 +89,7 @@ export class TestNavigation extends LitElement {
    * only re-evaluates when an attempt is processed, so a freshly-picked answer
    * doesn't flip `done` until the candidate ends the attempt.
    */
-  #optimality = new Map<string, 'unknown' | 'optimal' | 'suboptimal'>();
+  #optimality = new Map<string, ItemOptimality>();
 
   constructor() {
     super();
@@ -495,7 +502,7 @@ export class TestNavigation extends LitElement {
                 // holds the submitted response.
                 let optimality = this.#optimality.get(computedItem.identifier);
                 if (optimality === undefined) {
-                  optimality = itemContext ? this.#assessOptimality(itemContext) : 'unknown';
+                  optimality = itemContext ? this.#assessOptimality(itemContext) : 'unscored';
                   if (numAttempts > 0) this.#optimality.set(computedItem.identifier, optimality);
                 }
 
@@ -542,7 +549,7 @@ export class TestNavigation extends LitElement {
    * - Info items don't require submission.
    * - Otherwise the candidate must have actually ended an attempt (numAttempts > 0).
    * - Once attempted, the item is done if they reached the optimal outcome
-   *   ('optimal'), or there's nothing to improve on ('unknown'). It is only *not*
+   *   ('optimal'), or there's nothing to improve on ('unscored'). It is only *not*
    *   done while a better attempt is still possible ('suboptimal') and attempts
    *   remain — see #assessOptimality for how "optimal" is determined.
    *
@@ -550,11 +557,7 @@ export class TestNavigation extends LitElement {
    * live selection — so a freshly-picked optimal answer doesn't count as done
    * until test-end-attempt evaluates it.
    */
-  #isItemDone(
-    numAttempts: number,
-    optimality: 'unknown' | 'optimal' | 'suboptimal',
-    maxAttempts: number | undefined
-  ): boolean {
+  #isItemDone(numAttempts: number, optimality: ItemOptimality, maxAttempts: number | undefined): boolean {
     if (numAttempts === 0) return false;
     if (optimality !== 'suboptimal') return true;
     const max = maxAttempts ?? 1;
@@ -565,7 +568,7 @@ export class TestNavigation extends LitElement {
    * Decide whether an item's submission is as good as it can get — i.e. the
    * candidate reached the *optimal* outcome, so there's no reason to make them
    * try again. 'optimal' means best achievable, 'suboptimal' means a better
-   * attempt is still possible, 'unknown' means there's nothing to judge against.
+   * attempt is still possible, 'unscored' means there's nothing to judge against.
    * ("optimal" is the spec's own word — a qti-correct-response is defined as
    * "the (or an) optimal value".)
    *
@@ -579,9 +582,9 @@ export class TestNavigation extends LitElement {
    *     correctResponse, so we filter on a declared correctResponse.
    *
    * Items with neither a comparable score nor a correctResponse (essays, etc.)
-   * are 'unknown' — there's no optimal value to require, so one attempt is enough.
+   * are 'unscored' — there's no optimal value to require, so one attempt is enough.
    */
-  #assessOptimality(item: ItemContext): 'unknown' | 'optimal' | 'suboptimal' {
+  #assessOptimality(item: ItemContext): ItemOptimality {
     const variables = item.variables ?? [];
 
     const score = this.#numericVariable(variables, 'SCORE');
@@ -596,7 +599,7 @@ export class TestNavigation extends LitElement {
         (v as ResponseVariable).correctResponse !== undefined &&
         (v as ResponseVariable).correctResponse !== null
     );
-    if (responseVars.length === 0) return 'unknown';
+    if (responseVars.length === 0) return 'unscored';
     const allMatch = responseVars.every(v => {
       const expected = v.correctResponse;
       const actual = v.value;
