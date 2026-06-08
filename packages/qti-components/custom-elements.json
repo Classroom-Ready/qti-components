@@ -42200,7 +42200,7 @@
                   }
                 }
               ],
-              "description": "Compare current response values to their declared qti-correct-response.\nBookkeeping variables like numAttempts can be typed 'response' but never\ndeclare a correctResponse, so filter on declared correctResponse.\nReturns 'unknown' for items without any judgeable response (essays, etc.)."
+              "description": "Compare current response values to their declared qti-correct-response.\nBookkeeping variables like numAttempts can be typed 'response' but never\ndeclare a correctResponse, so filter on declared correctResponse.\nReturns 'unknown' for items without any judgeable response (essays, etc.).\n\nNB: per the QTI spec a declared correctResponse \"may indicate the only\npossible value… or merely just *a* correct value\", and complex/partial\nscoring is done by response processing (e.g. qti-mapping → SCORE). This\nexact match therefore mirrors the `correct` operator, not the item's score:\nit can disagree with mapping/partial-credit/multiple-answer items. We accept\nthat trade-off to avoid depending on a SCORE outcome that isn't guaranteed to\nexist; items with no declared correctResponse fall through to 'unknown'."
             },
             {
               "kind": "field",

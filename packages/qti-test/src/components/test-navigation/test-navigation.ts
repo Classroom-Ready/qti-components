@@ -567,6 +567,14 @@ export class TestNavigation extends LitElement {
    * Bookkeeping variables like numAttempts can be typed 'response' but never
    * declare a correctResponse, so filter on declared correctResponse.
    * Returns 'unknown' for items without any judgeable response (essays, etc.).
+   *
+   * NB: per the QTI spec a declared correctResponse "may indicate the only
+   * possible value… or merely just *a* correct value", and complex/partial
+   * scoring is done by response processing (e.g. qti-mapping → SCORE). This
+   * exact match therefore mirrors the `correct` operator, not the item's score:
+   * it can disagree with mapping/partial-credit/multiple-answer items. We accept
+   * that trade-off to avoid depending on a SCORE outcome that isn't guaranteed to
+   * exist; items with no declared correctResponse fall through to 'unknown'.
    */
   #assessCorrectness(item: ItemContext): 'unknown' | 'correct' | 'incorrect' {
     const responseVars = (item.variables ?? []).filter(
