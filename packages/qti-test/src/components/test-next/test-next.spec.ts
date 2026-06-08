@@ -32,23 +32,27 @@ describe('TestNext', () => {
       view: 'candidate',
       identifier: 'test',
       title: 'Test',
-      testParts: [{
-        active: true,
-        identifier: 'part1',
-        navigationMode: 'nonlinear',
-        submissionMode: 'individual',
-        sections: [{
+      testParts: [
+        {
           active: true,
-          identifier: 'section1',
-          title: 'Section 1',
+          identifier: 'part1',
           navigationMode: 'nonlinear',
           submissionMode: 'individual',
-          items: [
-            { identifier: 'item1', active: true, variables: [], completionStatus: 'not_attempted' },
-            { identifier: 'item2', active: false, variables: [], completionStatus: 'not_attempted' }
+          sections: [
+            {
+              active: true,
+              identifier: 'section1',
+              title: 'Section 1',
+              navigationMode: 'nonlinear',
+              submissionMode: 'individual',
+              items: [
+                { identifier: 'item1', active: true, variables: [], completionStatus: 'not_attempted' },
+                { identifier: 'item2', active: false, variables: [], completionStatus: 'not_attempted' }
+              ]
+            }
           ]
-        }]
-      }]
+        }
+      ]
     };
 
     el.computedContext = context;
@@ -57,7 +61,7 @@ describe('TestNext', () => {
     expect(el).toBeEnabled();
   });
 
-  it('should be disabled in linear mode when current item is not completed', async () => {
+  it('should be disabled in linear mode when current item is not done', async () => {
     const el = document.createElement('test-next') as any;
     container.appendChild(el);
 
@@ -65,23 +69,27 @@ describe('TestNext', () => {
       view: 'candidate',
       identifier: 'test',
       title: 'Test',
-      testParts: [{
-        active: true,
-        identifier: 'part1',
-        navigationMode: 'linear',
-        submissionMode: 'individual',
-        sections: [{
+      testParts: [
+        {
           active: true,
-          identifier: 'section1',
-          title: 'Section 1',
+          identifier: 'part1',
           navigationMode: 'linear',
           submissionMode: 'individual',
-          items: [
-            { identifier: 'item1', active: true, variables: [], completionStatus: 'not_attempted' },
-            { identifier: 'item2', active: false, variables: [], completionStatus: 'not_attempted' }
+          sections: [
+            {
+              active: true,
+              identifier: 'section1',
+              title: 'Section 1',
+              navigationMode: 'linear',
+              submissionMode: 'individual',
+              items: [
+                { identifier: 'item1', active: true, variables: [], completionStatus: 'not_attempted', done: false },
+                { identifier: 'item2', active: false, variables: [], completionStatus: 'not_attempted', done: false }
+              ]
+            }
           ]
-        }]
-      }]
+        }
+      ]
     };
 
     el.computedContext = context;
@@ -98,23 +106,27 @@ describe('TestNext', () => {
       view: 'candidate',
       identifier: 'test',
       title: 'Test',
-      testParts: [{
-        active: true,
-        identifier: 'part1',
-        navigationMode: 'linear',
-        submissionMode: 'simultaneous',
-        sections: [{
+      testParts: [
+        {
           active: true,
-          identifier: 'section1',
-          title: 'Section 1',
+          identifier: 'part1',
           navigationMode: 'linear',
           submissionMode: 'simultaneous',
-          items: [
-            { identifier: 'item1', active: true, variables: [], completionStatus: 'not_attempted' },
-            { identifier: 'item2', active: false, variables: [], completionStatus: 'not_attempted' }
+          sections: [
+            {
+              active: true,
+              identifier: 'section1',
+              title: 'Section 1',
+              navigationMode: 'linear',
+              submissionMode: 'simultaneous',
+              items: [
+                { identifier: 'item1', active: true, variables: [], completionStatus: 'not_attempted' },
+                { identifier: 'item2', active: false, variables: [], completionStatus: 'not_attempted' }
+              ]
+            }
           ]
-        }]
-      }]
+        }
+      ]
     };
 
     el.computedContext = context;
@@ -123,7 +135,7 @@ describe('TestNext', () => {
     expect(el).toBeEnabled();
   });
 
-  it('should be enabled in linear mode when current item is submitted', async () => {
+  it('should be enabled in linear mode when current item is done (correct or maxAttempts reached)', async () => {
     const el = document.createElement('test-next') as any;
     container.appendChild(el);
 
@@ -158,7 +170,8 @@ describe('TestNext', () => {
                       defaultValue: '0'
                     }
                   ],
-                  completionStatus: 'completed'
+                  completionStatus: 'completed',
+                  done: true
                 },
                 {
                   identifier: 'item2',
@@ -169,11 +182,12 @@ describe('TestNext', () => {
                       type: 'outcome',
                       cardinality: 'single',
                       baseType: 'integer',
-                      value: '1',
+                      value: '0',
                       defaultValue: '0'
                     }
                   ],
-                  completionStatus: 'not_attempted'
+                  completionStatus: 'not_attempted',
+                  done: false
                 }
               ]
             }
@@ -188,7 +202,7 @@ describe('TestNext', () => {
     expect(el).toBeEnabled();
   });
 
-  it('should be disabled in linear mode when current item is completed but not submitted', async () => {
+  it('should be disabled in linear mode when current item is attempted but not done (incorrect, attempts remaining)', async () => {
     const el = document.createElement('test-next') as any;
     container.appendChild(el);
 
@@ -196,23 +210,27 @@ describe('TestNext', () => {
       view: 'candidate',
       identifier: 'test',
       title: 'Test',
-      testParts: [{
-        active: true,
-        identifier: 'part1',
-        navigationMode: 'linear',
-        submissionMode: 'individual',
-        sections: [{
+      testParts: [
+        {
           active: true,
-          identifier: 'section1',
-          title: 'Section 1',
+          identifier: 'part1',
           navigationMode: 'linear',
           submissionMode: 'individual',
-          items: [
-            { identifier: 'item1', active: true, variables: [], completionStatus: 'completed'},
-            { identifier: 'item2', active: false, variables: [], completionStatus: 'not_attempted' }
+          sections: [
+            {
+              active: true,
+              identifier: 'section1',
+              title: 'Section 1',
+              navigationMode: 'linear',
+              submissionMode: 'individual',
+              items: [
+                { identifier: 'item1', active: true, variables: [], completionStatus: 'completed', done: false },
+                { identifier: 'item2', active: false, variables: [], completionStatus: 'not_attempted', done: false }
+              ]
+            }
           ]
-        }]
-      }]
+        }
+      ]
     };
 
     el.computedContext = context;
@@ -229,23 +247,27 @@ describe('TestNext', () => {
       view: 'candidate',
       identifier: 'test',
       title: 'Test',
-      testParts: [{
-        active: true,
-        identifier: 'part1',
-        navigationMode: 'nonlinear',
-        submissionMode: 'individual',
-        sections: [{
+      testParts: [
+        {
           active: true,
-          identifier: 'section1',
-          title: 'Section 1',
+          identifier: 'part1',
           navigationMode: 'nonlinear',
           submissionMode: 'individual',
-          items: [
-            { identifier: 'item1', active: false, variables: [], completionStatus: 'completed' },
-            { identifier: 'item2', active: true, variables: [], completionStatus: 'completed' }
+          sections: [
+            {
+              active: true,
+              identifier: 'section1',
+              title: 'Section 1',
+              navigationMode: 'nonlinear',
+              submissionMode: 'individual',
+              items: [
+                { identifier: 'item1', active: false, variables: [], completionStatus: 'completed' },
+                { identifier: 'item2', active: true, variables: [], completionStatus: 'completed' }
+              ]
+            }
           ]
-        }]
-      }]
+        }
+      ]
     };
 
     el.computedContext = context;
