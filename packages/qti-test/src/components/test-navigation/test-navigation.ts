@@ -75,6 +75,14 @@ export class TestNavigation extends LitElement {
   #endedParts = new Set<string>();
   /** Whether the end-of-test transition has already been announced. */
   #testEnded = false;
+  /**
+   * Correctness of each item's last *ended attempt*, keyed by item-ref id.
+   * Written only when an attempt is actually ended (test-end-attempt / autoscore
+   * processResponse) — never on a plain selection. Mirrors how inline feedback
+   * only re-evaluates when an attempt is processed, so a freshly-picked answer
+   * doesn't flip `done` until the candidate ends the attempt.
+   */
+  #correctness = new Map<string, 'unknown' | 'correct' | 'incorrect'>();
 
   constructor() {
     super();
@@ -91,6 +99,7 @@ export class TestNavigation extends LitElement {
     this.addEventListener('qti-testdoc-loaded', () => {
       this.#endedParts.clear();
       this.#testEnded = false;
+      this.#correctness.clear();
     });
   }
 
@@ -107,6 +116,19 @@ export class TestNavigation extends LitElement {
     const qtiAssessmentItemEl = qtiItemEl.assessmentItem;
     const reportValidityAfterScoring = this.configContext?.reportValidityAfterScoring === true ? true : false;
     qtiAssessmentItemEl.processResponse(true, reportValidityAfterScoring);
+    this.#latchCorrectness(this._sessionContext?.navItemRefId);
+  }
+
+  /**
+   * Record the correctness of an item's just-ended attempt, keyed by item-ref id.
+   * Read from the test context (which carries each response's qti-correct-response);
+   * by the time an attempt is ended the submitted RESPONSE has already settled
+   * there, so this judges the submission — not a later mid-attempt selection.
+   */
+  #latchCorrectness(refId: string | undefined): void {
+    if (!refId) return;
+    const itemContext = this._testContext?.items.find(i => i.identifier === refId);
+    if (itemContext) this.#correctness.set(refId, this.#assessCorrectness(itemContext));
   }
 
   /**
@@ -159,6 +181,7 @@ export class TestNavigation extends LitElement {
       ) {
         const reportValidityAfterScoring = this.configContext?.reportValidityAfterScoring === true ? true : false;
         assessmentItem.processResponse(true, reportValidityAfterScoring);
+        this.#latchCorrectness(assessmentItem.assessmentItemRefId);
       }
     }
   }
@@ -463,7 +486,18 @@ export class TestNavigation extends LitElement {
                 const maxScore =
                   rawMaxScore === undefined || rawMaxScore === null ? null : parseFloat(rawMaxScore?.toString());
 
-                const done = this.#isItemDone(numAttempts, itemContext, computedItem.maxAttempts);
+                // Correctness comes from the last *ended attempt* (#correctness),
+                // latched after every processResponse (test-end-attempt + autoscore) —
+                // never from a live mid-attempt selection. On a restored session no
+                // attempt is ended this run, so seed it once from the persisted
+                // context, which still holds the submitted response.
+                let correctness = this.#correctness.get(computedItem.identifier);
+                if (correctness === undefined) {
+                  correctness = itemContext ? this.#assessCorrectness(itemContext) : 'unknown';
+                  if (numAttempts > 0) this.#correctness.set(computedItem.identifier, correctness);
+                }
+
+                const done = this.#isItemDone(numAttempts, correctness, computedItem.maxAttempts);
 
                 return {
                   ...computedItem,
@@ -508,10 +542,17 @@ export class TestNavigation extends LitElement {
    * - Once attempted, we treat the submission as their final answer unless we
    *   can prove the answer is wrong AND there are attempts left. We can only
    *   prove "wrong" when the item declares a qti-correct-response.
+   *
+   * `correctness` reflects the last *ended attempt* (see #correctness), not the
+   * live selection — so a freshly-picked correct answer doesn't count as done
+   * until test-end-attempt evaluates it.
    */
-  #isItemDone(numAttempts: number, itemContext: ItemContext | undefined, maxAttempts: number | undefined): boolean {
+  #isItemDone(
+    numAttempts: number,
+    correctness: 'unknown' | 'correct' | 'incorrect',
+    maxAttempts: number | undefined
+  ): boolean {
     if (numAttempts === 0) return false;
-    const correctness = itemContext ? this.#assessCorrectness(itemContext) : 'unknown';
     if (correctness !== 'incorrect') return true;
     const max = maxAttempts ?? 1;
     return max > 0 && numAttempts >= max;

@@ -42204,6 +42204,13 @@
             },
             {
               "kind": "field",
+              "name": "#correctness",
+              "privacy": "private",
+              "default": "new Map<string, 'unknown' | 'correct' | 'incorrect'>()",
+              "description": "Correctness of each item's last *ended attempt*, keyed by item-ref id.\nWritten only when an attempt is actually ended (test-end-attempt / autoscore\nprocessResponse) — never on a plain selection. Mirrors how inline feedback\nonly re-evaluates when an attempt is processed, so a freshly-picked answer\ndoesn't flip `done` until the candidate ends the attempt."
+            },
+            {
+              "kind": "field",
               "name": "#endedParts",
               "privacy": "private",
               "default": "new Set<string>()",
@@ -42348,9 +42355,9 @@
                   }
                 },
                 {
-                  "name": "itemContext",
+                  "name": "correctness",
                   "type": {
-                    "text": "ItemContext | undefined"
+                    "text": "'unknown' | 'correct' | 'incorrect'"
                   }
                 },
                 {
@@ -42360,7 +42367,26 @@
                   }
                 }
               ],
-              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, we treat the submission as their final answer unless we\n  can prove the answer is wrong AND there are attempts left. We can only\n  prove \"wrong\" when the item declares a qti-correct-response."
+              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, we treat the submission as their final answer unless we\n  can prove the answer is wrong AND there are attempts left. We can only\n  prove \"wrong\" when the item declares a qti-correct-response.\n\n`correctness` reflects the last *ended attempt* (see #correctness), not the\nlive selection — so a freshly-picked correct answer doesn't count as done\nuntil test-end-attempt evaluates it."
+            },
+            {
+              "kind": "method",
+              "name": "#latchCorrectness",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "refId",
+                  "type": {
+                    "text": "string | undefined"
+                  }
+                }
+              ],
+              "description": "Record the correctness of an item's just-ended attempt, keyed by item-ref id.\nRead from the test context (which carries each response's qti-correct-response);\nby the time an attempt is ended the submitted RESPONSE has already settled\nthere, so this judges the submission — not a later mid-attempt selection."
             },
             {
               "kind": "field",
