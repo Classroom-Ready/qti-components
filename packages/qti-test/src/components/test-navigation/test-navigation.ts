@@ -76,13 +76,13 @@ export class TestNavigation extends LitElement {
   /** Whether the end-of-test transition has already been announced. */
   #testEnded = false;
   /**
-   * Correctness of each item's last *ended attempt*, keyed by item-ref id.
-   * Written from #handleItemContextUpdated when processResponse ends an attempt —
-   * never on a plain selection. Mirrors how inline feedback only re-evaluates
-   * when an attempt is processed, so a freshly-picked answer doesn't flip `done`
-   * until the candidate ends the attempt.
+   * Whether each item's last *ended attempt* reached the optimal outcome, keyed
+   * by item-ref id. Written from #handleItemContextUpdated when processResponse
+   * ends an attempt — never on a plain selection. Mirrors how inline feedback
+   * only re-evaluates when an attempt is processed, so a freshly-picked answer
+   * doesn't flip `done` until the candidate ends the attempt.
    */
-  #correctness = new Map<string, 'unknown' | 'correct' | 'incorrect'>();
+  #optimality = new Map<string, 'unknown' | 'optimal' | 'suboptimal'>();
 
   constructor() {
     super();
@@ -100,7 +100,7 @@ export class TestNavigation extends LitElement {
     this.addEventListener('qti-testdoc-loaded', () => {
       this.#endedParts.clear();
       this.#testEnded = false;
-      this.#correctness.clear();
+      this.#optimality.clear();
     });
   }
 
@@ -120,17 +120,17 @@ export class TestNavigation extends LitElement {
   }
 
   /**
-   * Latch an item's correctness whenever it has just ended an attempt.
-   * processResponse — fired by test-end-attempt, autoscore, or an in-item
-   * end-attempt interaction — flags its context update with `responseProcessed`;
-   * a plain selection updates the context without it, so `done` can't flip until
-   * the candidate actually ends the attempt.
+   * Latch whether an item reached its optimal outcome whenever it has just ended
+   * an attempt. processResponse — fired by test-end-attempt, autoscore, or an
+   * in-item end-attempt interaction — flags its context update with
+   * `responseProcessed`; a plain selection updates the context without it, so
+   * `done` can't flip until the candidate actually ends the attempt.
    */
   #handleItemContextUpdated(event: CustomEvent<{ itemContext: ItemContext; responseProcessed?: boolean }>) {
     if (!event.detail?.responseProcessed) return;
     const itemContext = event.detail.itemContext;
     if (itemContext?.identifier) {
-      this.#correctness.set(itemContext.identifier, this.#assessCorrectness(itemContext));
+      this.#optimality.set(itemContext.identifier, this.#assessOptimality(itemContext));
     }
   }
 
@@ -488,18 +488,18 @@ export class TestNavigation extends LitElement {
                 const maxScore =
                   rawMaxScore === undefined || rawMaxScore === null ? null : parseFloat(rawMaxScore?.toString());
 
-                // Correctness comes from the last *ended attempt* (#correctness),
+                // Optimality comes from the last *ended attempt* (#optimality),
                 // latched in #handleItemContextUpdated — never from a live
                 // mid-attempt selection. On a restored session no attempt is ended
                 // this run, so seed it once from the persisted context, which still
                 // holds the submitted response.
-                let correctness = this.#correctness.get(computedItem.identifier);
-                if (correctness === undefined) {
-                  correctness = itemContext ? this.#assessCorrectness(itemContext) : 'unknown';
-                  if (numAttempts > 0) this.#correctness.set(computedItem.identifier, correctness);
+                let optimality = this.#optimality.get(computedItem.identifier);
+                if (optimality === undefined) {
+                  optimality = itemContext ? this.#assessOptimality(itemContext) : 'unknown';
+                  if (numAttempts > 0) this.#optimality.set(computedItem.identifier, optimality);
                 }
 
-                const done = this.#isItemDone(numAttempts, correctness, computedItem.maxAttempts);
+                const done = this.#isItemDone(numAttempts, optimality, computedItem.maxAttempts);
 
                 return {
                   ...computedItem,
@@ -541,53 +541,53 @@ export class TestNavigation extends LitElement {
    *
    * - Info items don't require submission.
    * - Otherwise the candidate must have actually ended an attempt (numAttempts > 0).
-   * - Once attempted, the item is done if they reached the best achievable
-   *   outcome ('correct'), or there's nothing to improve on ('unknown'). It is
-   *   only *not* done while a better attempt is still possible ('incorrect') and
-   *   attempts remain — see #assessCorrectness for how "best" is determined.
+   * - Once attempted, the item is done if they reached the optimal outcome
+   *   ('optimal'), or there's nothing to improve on ('unknown'). It is only *not*
+   *   done while a better attempt is still possible ('suboptimal') and attempts
+   *   remain — see #assessOptimality for how "optimal" is determined.
    *
-   * `correctness` reflects the last *ended attempt* (see #correctness), not the
-   * live selection — so a freshly-picked best answer doesn't count as done until
-   * test-end-attempt evaluates it.
+   * `optimality` reflects the last *ended attempt* (see #optimality), not the
+   * live selection — so a freshly-picked optimal answer doesn't count as done
+   * until test-end-attempt evaluates it.
    */
   #isItemDone(
     numAttempts: number,
-    correctness: 'unknown' | 'correct' | 'incorrect',
+    optimality: 'unknown' | 'optimal' | 'suboptimal',
     maxAttempts: number | undefined
   ): boolean {
     if (numAttempts === 0) return false;
-    if (correctness !== 'incorrect') return true;
+    if (optimality !== 'suboptimal') return true;
     const max = maxAttempts ?? 1;
     return max > 0 && numAttempts >= max;
   }
 
   /**
    * Decide whether an item's submission is as good as it can get — i.e. the
-   * candidate achieved the *best* outcome, so there's no reason to make them
-   * try again. 'correct' means best, 'incorrect' means a better attempt is
-   * still possible, 'unknown' means there's nothing to judge against.
+   * candidate reached the *optimal* outcome, so there's no reason to make them
+   * try again. 'optimal' means best achievable, 'suboptimal' means a better
+   * attempt is still possible, 'unknown' means there's nothing to judge against.
+   * ("optimal" is the spec's own word — a qti-correct-response is defined as
+   * "the (or an) optimal value".)
    *
    * Two signals, in order of authority:
-   *  1. The scored outcome: best ⟺ SCORE has reached its maximum (MAXSCORE).
-   *     This is the spec's notion of an optimal response and correctly handles
-   *     partial-credit / qti-mapping items, where an exact response match would
-   *     under- or over-judge.
+   *  1. The scored outcome: optimal ⟺ SCORE has reached its maximum (MAXSCORE).
+   *     This correctly handles partial-credit / qti-mapping items, where an exact
+   *     response match would under- or over-judge.
    *  2. The declared qti-correct-response, for items that aren't scored (no
-   *     SCORE/MAXSCORE). The spec calls this "the (or an) optimal value", so an
-   *     exact match is the best available proxy. Bookkeeping variables like
-   *     numAttempts can be typed 'response' but never declare a correctResponse,
-   *     so we filter on a declared correctResponse.
+   *     SCORE/MAXSCORE) — an exact match is the best available proxy. Bookkeeping
+   *     variables like numAttempts can be typed 'response' but never declare a
+   *     correctResponse, so we filter on a declared correctResponse.
    *
    * Items with neither a comparable score nor a correctResponse (essays, etc.)
    * are 'unknown' — there's no optimal value to require, so one attempt is enough.
    */
-  #assessCorrectness(item: ItemContext): 'unknown' | 'correct' | 'incorrect' {
+  #assessOptimality(item: ItemContext): 'unknown' | 'optimal' | 'suboptimal' {
     const variables = item.variables ?? [];
 
     const score = this.#numericVariable(variables, 'SCORE');
     const maxScore = this.#numericVariable(variables, 'MAXSCORE');
     if (score !== null && maxScore !== null) {
-      return score >= maxScore ? 'correct' : 'incorrect';
+      return score >= maxScore ? 'optimal' : 'suboptimal';
     }
 
     const responseVars = variables.filter(
@@ -607,7 +607,7 @@ export class TestNavigation extends LitElement {
       if (Array.isArray(expected) || Array.isArray(actual)) return false;
       return expected === actual;
     });
-    return allMatch ? 'correct' : 'incorrect';
+    return allMatch ? 'optimal' : 'suboptimal';
   }
 
   /** Read a single numeric outcome value, or null when absent / non-numeric. */

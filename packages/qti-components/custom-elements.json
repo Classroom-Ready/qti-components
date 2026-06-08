@@ -42185,11 +42185,11 @@
             },
             {
               "kind": "method",
-              "name": "#assessCorrectness",
+              "name": "#assessOptimality",
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "'unknown' | 'correct' | 'incorrect'"
+                  "text": "'unknown' | 'optimal' | 'suboptimal'"
                 }
               },
               "parameters": [
@@ -42200,14 +42200,7 @@
                   }
                 }
               ],
-              "description": "Decide whether an item's submission is as good as it can get — i.e. the\ncandidate achieved the *best* outcome, so there's no reason to make them\ntry again. 'correct' means best, 'incorrect' means a better attempt is\nstill possible, 'unknown' means there's nothing to judge against.\n\nTwo signals, in order of authority:\n 1. The scored outcome: best ⟺ SCORE has reached its maximum (MAXSCORE).\n    This is the spec's notion of an optimal response and correctly handles\n    partial-credit / qti-mapping items, where an exact response match would\n    under- or over-judge.\n 2. The declared qti-correct-response, for items that aren't scored (no\n    SCORE/MAXSCORE). The spec calls this \"the (or an) optimal value\", so an\n    exact match is the best available proxy. Bookkeeping variables like\n    numAttempts can be typed 'response' but never declare a correctResponse,\n    so we filter on a declared correctResponse.\n\nItems with neither a comparable score nor a correctResponse (essays, etc.)\nare 'unknown' — there's no optimal value to require, so one attempt is enough."
-            },
-            {
-              "kind": "field",
-              "name": "#correctness",
-              "privacy": "private",
-              "default": "new Map<string, 'unknown' | 'correct' | 'incorrect'>()",
-              "description": "Correctness of each item's last *ended attempt*, keyed by item-ref id.\nWritten from #handleItemContextUpdated when processResponse ends an attempt —\nnever on a plain selection. Mirrors how inline feedback only re-evaluates\nwhen an attempt is processed, so a freshly-picked answer doesn't flip `done`\nuntil the candidate ends the attempt."
+              "description": "Decide whether an item's submission is as good as it can get — i.e. the\ncandidate reached the *optimal* outcome, so there's no reason to make them\ntry again. 'optimal' means best achievable, 'suboptimal' means a better\nattempt is still possible, 'unknown' means there's nothing to judge against.\n(\"optimal\" is the spec's own word — a qti-correct-response is defined as\n\"the (or an) optimal value\".)\n\nTwo signals, in order of authority:\n 1. The scored outcome: optimal ⟺ SCORE has reached its maximum (MAXSCORE).\n    This correctly handles partial-credit / qti-mapping items, where an exact\n    response match would under- or over-judge.\n 2. The declared qti-correct-response, for items that aren't scored (no\n    SCORE/MAXSCORE) — an exact match is the best available proxy. Bookkeeping\n    variables like numAttempts can be typed 'response' but never declare a\n    correctResponse, so we filter on a declared correctResponse.\n\nItems with neither a comparable score nor a correctResponse (essays, etc.)\nare 'unknown' — there's no optimal value to require, so one attempt is enough."
             },
             {
               "kind": "field",
@@ -42273,7 +42266,7 @@
                   }
                 }
               ],
-              "description": "Latch an item's correctness whenever it has just ended an attempt.\nprocessResponse — fired by test-end-attempt, autoscore, or an in-item\nend-attempt interaction — flags its context update with `responseProcessed`;\na plain selection updates the context without it, so `done` can't flip until\nthe candidate actually ends the attempt."
+              "description": "Latch whether an item reached its optimal outcome whenever it has just ended\nan attempt. processResponse — fired by test-end-attempt, autoscore, or an\nin-item end-attempt interaction — flags its context update with\n`responseProcessed`; a plain selection updates the context without it, so\n`done` can't flip until the candidate actually ends the attempt."
             },
             {
               "kind": "method",
@@ -42369,9 +42362,9 @@
                   }
                 },
                 {
-                  "name": "correctness",
+                  "name": "optimality",
                   "type": {
-                    "text": "'unknown' | 'correct' | 'incorrect'"
+                    "text": "'unknown' | 'optimal' | 'suboptimal'"
                   }
                 },
                 {
@@ -42381,7 +42374,7 @@
                   }
                 }
               ],
-              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, the item is done if they reached the best achievable\n  outcome ('correct'), or there's nothing to improve on ('unknown'). It is\n  only *not* done while a better attempt is still possible ('incorrect') and\n  attempts remain — see #assessCorrectness for how \"best\" is determined.\n\n`correctness` reflects the last *ended attempt* (see #correctness), not the\nlive selection — so a freshly-picked best answer doesn't count as done until\ntest-end-attempt evaluates it."
+              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, the item is done if they reached the optimal outcome\n  ('optimal'), or there's nothing to improve on ('unknown'). It is only *not*\n  done while a better attempt is still possible ('suboptimal') and attempts\n  remain — see #assessOptimality for how \"optimal\" is determined.\n\n`optimality` reflects the last *ended attempt* (see #optimality), not the\nlive selection — so a freshly-picked optimal answer doesn't count as done\nuntil test-end-attempt evaluates it."
             },
             {
               "kind": "method",
@@ -42407,6 +42400,13 @@
                 }
               ],
               "description": "Read a single numeric outcome value, or null when absent / non-numeric."
+            },
+            {
+              "kind": "field",
+              "name": "#optimality",
+              "privacy": "private",
+              "default": "new Map<string, 'unknown' | 'optimal' | 'suboptimal'>()",
+              "description": "Whether each item's last *ended attempt* reached the optimal outcome, keyed\nby item-ref id. Written from #handleItemContextUpdated when processResponse\nends an attempt — never on a plain selection. Mirrors how inline feedback\nonly re-evaluates when an attempt is processed, so a freshly-picked answer\ndoesn't flip `done` until the candidate ends the attempt."
             },
             {
               "kind": "field",
