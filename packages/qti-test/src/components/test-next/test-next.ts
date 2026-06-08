@@ -86,8 +86,8 @@ export class TestNext extends LitElement {
     const isLinearIndividual = navigationMode === 'linear' && submissionMode === 'individual';
 
     // In linear individual mode the candidate may only advance once they are
-    // "done" with the active item: they answered correctly, exhausted
-    // maxAttempts, or the item has no judgeable correct response. `done` is
+    // "done" with the active item: they reached the optimal outcome (best score),
+    // exhausted maxAttempts, or the item has no judgeable optimal value. `done` is
     // computed centrally in test-navigation (#isItemDone), so this Next gate
     // matches the exact rule that fires end-of-part/test outcome processing.
     this._internalDisabled =
