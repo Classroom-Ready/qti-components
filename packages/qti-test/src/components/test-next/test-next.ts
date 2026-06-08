@@ -84,17 +84,17 @@ export class TestNext extends LitElement {
     const activeItem = this.sectionItems[this.itemIndex];
 
     const isLinearIndividual = navigationMode === 'linear' && submissionMode === 'individual';
-    // Use numAttempts to check if the item has been submitted
-    const numAttempts = Number(activeItem.variables.find(v => v.identifier === 'numAttempts')?.value) || 0;
 
-    const isNotSubmitted = activeItem && numAttempts === 0;
-    const isNotCompleted = activeItem && activeItem.completionStatus !== 'completed';
-
+    // In linear individual mode the candidate may only advance once they are
+    // "done" with the active item: they answered correctly, exhausted
+    // maxAttempts, or the item has no judgeable correct response. `done` is
+    // computed centrally in test-navigation (#isItemDone), so this Next gate
+    // matches the exact rule that fires end-of-part/test outcome processing.
     this._internalDisabled =
       !this.computedContext ||
       this.itemIndex < 0 ||
       this.itemIndex >= (this.sectionItems?.length ?? 0) - 1 ||
-      (isLinearIndividual && (isNotSubmitted || isNotCompleted));
+      (isLinearIndividual && !activeItem?.done);
   }
 
   protected _requestItem(identifier: string): void {
