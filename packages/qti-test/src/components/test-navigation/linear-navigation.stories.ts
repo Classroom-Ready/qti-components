@@ -184,11 +184,8 @@ export const LinearGatingWithoutResponseProcessing: StoryObj = {
     <qti-test navigate="item">
       <test-navigation>
         <test-container test-url="/assets/qti-test-package/assessment-linear-noprocessing.xml"></test-container>
-        <div class="d-flex align-items-center justify-content-between mt-4">
-          <test-prev id="prev-btn" class="btn btn-secondary">Previous</test-prev>
-          <test-end-attempt id="end-attempt-btn" class="btn btn-warning">End Attempt</test-end-attempt>
-          <test-next id="next-btn" class="btn btn-primary">Next</test-next>
-        </div>
+        <test-end-attempt>End Attempt</test-end-attempt>
+        <test-next>Next</test-next>
       </test-navigation>
     </qti-test>
   `,
