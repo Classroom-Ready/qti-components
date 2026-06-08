@@ -42200,7 +42200,7 @@
                   }
                 }
               ],
-              "description": "Compare current response values to their declared qti-correct-response.\nBookkeeping variables like numAttempts can be typed 'response' but never\ndeclare a correctResponse, so filter on declared correctResponse.\nReturns 'unknown' for items without any judgeable response (essays, etc.).\n\nNB: per the QTI spec a declared correctResponse \"may indicate the only\npossible value… or merely just *a* correct value\", and complex/partial\nscoring is done by response processing (e.g. qti-mapping → SCORE). This\nexact match therefore mirrors the `correct` operator, not the item's score:\nit can disagree with mapping/partial-credit/multiple-answer items. We accept\nthat trade-off to avoid depending on a SCORE outcome that isn't guaranteed to\nexist; items with no declared correctResponse fall through to 'unknown'."
+              "description": "Decide whether an item's submission is as good as it can get — i.e. the\ncandidate achieved the *best* outcome, so there's no reason to make them\ntry again. 'correct' means best, 'incorrect' means a better attempt is\nstill possible, 'unknown' means there's nothing to judge against.\n\nTwo signals, in order of authority:\n 1. The scored outcome: best ⟺ SCORE has reached its maximum (MAXSCORE).\n    This is the spec's notion of an optimal response and correctly handles\n    partial-credit / qti-mapping items, where an exact response match would\n    under- or over-judge.\n 2. The declared qti-correct-response, for items that aren't scored (no\n    SCORE/MAXSCORE). The spec calls this \"the (or an) optimal value\", so an\n    exact match is the best available proxy. Bookkeeping variables like\n    numAttempts can be typed 'response' but never declare a correctResponse,\n    so we filter on a declared correctResponse.\n\nItems with neither a comparable score nor a correctResponse (essays, etc.)\nare 'unknown' — there's no optimal value to require, so one attempt is enough."
             },
             {
               "kind": "field",
@@ -42381,7 +42381,32 @@
                   }
                 }
               ],
-              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, we treat the submission as their final answer unless we\n  can prove the answer is wrong AND there are attempts left. We can only\n  prove \"wrong\" when the item declares a qti-correct-response.\n\n`correctness` reflects the last *ended attempt* (see #correctness), not the\nlive selection — so a freshly-picked correct answer doesn't count as done\nuntil test-end-attempt evaluates it."
+              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, the item is done if they reached the best achievable\n  outcome ('correct'), or there's nothing to improve on ('unknown'). It is\n  only *not* done while a better attempt is still possible ('incorrect') and\n  attempts remain — see #assessCorrectness for how \"best\" is determined.\n\n`correctness` reflects the last *ended attempt* (see #correctness), not the\nlive selection — so a freshly-picked best answer doesn't count as done until\ntest-end-attempt evaluates it."
+            },
+            {
+              "kind": "method",
+              "name": "#numericVariable",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "variables",
+                  "type": {
+                    "text": "ItemContext['variables']"
+                  }
+                },
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Read a single numeric outcome value, or null when absent / non-numeric."
             },
             {
               "kind": "field",

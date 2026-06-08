@@ -541,13 +541,14 @@ export class TestNavigation extends LitElement {
    *
    * - Info items don't require submission.
    * - Otherwise the candidate must have actually ended an attempt (numAttempts > 0).
-   * - Once attempted, we treat the submission as their final answer unless we
-   *   can prove the answer is wrong AND there are attempts left. We can only
-   *   prove "wrong" when the item declares a qti-correct-response.
+   * - Once attempted, the item is done if they reached the best achievable
+   *   outcome ('correct'), or there's nothing to improve on ('unknown'). It is
+   *   only *not* done while a better attempt is still possible ('incorrect') and
+   *   attempts remain — see #assessCorrectness for how "best" is determined.
    *
    * `correctness` reflects the last *ended attempt* (see #correctness), not the
-   * live selection — so a freshly-picked correct answer doesn't count as done
-   * until test-end-attempt evaluates it.
+   * live selection — so a freshly-picked best answer doesn't count as done until
+   * test-end-attempt evaluates it.
    */
   #isItemDone(
     numAttempts: number,
@@ -561,21 +562,35 @@ export class TestNavigation extends LitElement {
   }
 
   /**
-   * Compare current response values to their declared qti-correct-response.
-   * Bookkeeping variables like numAttempts can be typed 'response' but never
-   * declare a correctResponse, so filter on declared correctResponse.
-   * Returns 'unknown' for items without any judgeable response (essays, etc.).
+   * Decide whether an item's submission is as good as it can get — i.e. the
+   * candidate achieved the *best* outcome, so there's no reason to make them
+   * try again. 'correct' means best, 'incorrect' means a better attempt is
+   * still possible, 'unknown' means there's nothing to judge against.
    *
-   * NB: per the QTI spec a declared correctResponse "may indicate the only
-   * possible value… or merely just *a* correct value", and complex/partial
-   * scoring is done by response processing (e.g. qti-mapping → SCORE). This
-   * exact match therefore mirrors the `correct` operator, not the item's score:
-   * it can disagree with mapping/partial-credit/multiple-answer items. We accept
-   * that trade-off to avoid depending on a SCORE outcome that isn't guaranteed to
-   * exist; items with no declared correctResponse fall through to 'unknown'.
+   * Two signals, in order of authority:
+   *  1. The scored outcome: best ⟺ SCORE has reached its maximum (MAXSCORE).
+   *     This is the spec's notion of an optimal response and correctly handles
+   *     partial-credit / qti-mapping items, where an exact response match would
+   *     under- or over-judge.
+   *  2. The declared qti-correct-response, for items that aren't scored (no
+   *     SCORE/MAXSCORE). The spec calls this "the (or an) optimal value", so an
+   *     exact match is the best available proxy. Bookkeeping variables like
+   *     numAttempts can be typed 'response' but never declare a correctResponse,
+   *     so we filter on a declared correctResponse.
+   *
+   * Items with neither a comparable score nor a correctResponse (essays, etc.)
+   * are 'unknown' — there's no optimal value to require, so one attempt is enough.
    */
   #assessCorrectness(item: ItemContext): 'unknown' | 'correct' | 'incorrect' {
-    const responseVars = (item.variables ?? []).filter(
+    const variables = item.variables ?? [];
+
+    const score = this.#numericVariable(variables, 'SCORE');
+    const maxScore = this.#numericVariable(variables, 'MAXSCORE');
+    if (score !== null && maxScore !== null) {
+      return score >= maxScore ? 'correct' : 'incorrect';
+    }
+
+    const responseVars = variables.filter(
       (v): v is ResponseVariable =>
         v.type === 'response' &&
         (v as ResponseVariable).correctResponse !== undefined &&
@@ -593,6 +608,14 @@ export class TestNavigation extends LitElement {
       return expected === actual;
     });
     return allMatch ? 'correct' : 'incorrect';
+  }
+
+  /** Read a single numeric outcome value, or null when absent / non-numeric. */
+  #numericVariable(variables: ItemContext['variables'], identifier: string): number | null {
+    const raw = variables?.find(v => v.identifier === identifier)?.value;
+    if (raw === undefined || raw === null || Array.isArray(raw)) return null;
+    const parsed = parseFloat(raw.toString());
+    return Number.isNaN(parsed) ? null : parsed;
   }
 
   /**
