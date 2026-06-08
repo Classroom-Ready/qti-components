@@ -224,8 +224,8 @@ export const LinearGatingWithoutResponseProcessing: StoryObj = {
       endAttemptBtn.click();
       await waitFor(() => expect(nextBtn).toBeDisabled());
 
-      // Select the CORRECT answer but do NOT submit it. This is the regression:
-      // Next must remain disabled until test-end-attempt evaluates the response.
+      // Select the CORRECT answer but do NOT submit it: Next must remain disabled
+      // until test-end-attempt evaluates the response.
       await pick(interaction, CORRECT_CHOICE);
       expect(nextBtn).toBeDisabled();
 

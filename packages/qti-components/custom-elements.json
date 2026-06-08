@@ -42207,7 +42207,7 @@
               "name": "#correctness",
               "privacy": "private",
               "default": "new Map<string, 'unknown' | 'correct' | 'incorrect'>()",
-              "description": "Correctness of each item's last *ended attempt*, keyed by item-ref id.\nWritten only when an attempt is actually ended (test-end-attempt / autoscore\nprocessResponse) — never on a plain selection. Mirrors how inline feedback\nonly re-evaluates when an attempt is processed, so a freshly-picked answer\ndoesn't flip `done` until the candidate ends the attempt."
+              "description": "Correctness of each item's last *ended attempt*, keyed by item-ref id.\nWritten from #handleItemContextUpdated when processResponse ends an attempt —\nnever on a plain selection. Mirrors how inline feedback only re-evaluates\nwhen an attempt is processed, so a freshly-picked answer doesn't flip `done`\nuntil the candidate ends the attempt."
             },
             {
               "kind": "field",
@@ -42260,6 +42260,20 @@
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "#handleItemContextUpdated",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<{ itemContext: ItemContext; responseProcessed?: boolean }>"
+                  }
+                }
+              ],
+              "description": "Latch an item's correctness whenever it has just ended an attempt.\nprocessResponse — fired by test-end-attempt, autoscore, or an in-item\nend-attempt interaction — flags its context update with `responseProcessed`;\na plain selection updates the context without it, so `done` can't flip until\nthe candidate actually ends the attempt. The event carries the freshly\nprocessed context (with each response's qti-correct-response), so judging it\nneeds no SCORE outcome."
             },
             {
               "kind": "method",
@@ -42368,25 +42382,6 @@
                 }
               ],
               "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, we treat the submission as their final answer unless we\n  can prove the answer is wrong AND there are attempts left. We can only\n  prove \"wrong\" when the item declares a qti-correct-response.\n\n`correctness` reflects the last *ended attempt* (see #correctness), not the\nlive selection — so a freshly-picked correct answer doesn't count as done\nuntil test-end-attempt evaluates it."
-            },
-            {
-              "kind": "method",
-              "name": "#latchCorrectness",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "refId",
-                  "type": {
-                    "text": "string | undefined"
-                  }
-                }
-              ],
-              "description": "Record the correctness of an item's just-ended attempt, keyed by item-ref id.\nRead from the test context (which carries each response's qti-correct-response);\nby the time an attempt is ended the submitted RESPONSE has already settled\nthere, so this judges the submission — not a later mid-attempt selection."
             },
             {
               "kind": "field",

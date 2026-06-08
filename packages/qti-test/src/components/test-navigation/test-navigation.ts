@@ -77,10 +77,10 @@ export class TestNavigation extends LitElement {
   #testEnded = false;
   /**
    * Correctness of each item's last *ended attempt*, keyed by item-ref id.
-   * Written only when an attempt is actually ended (test-end-attempt / autoscore
-   * processResponse) — never on a plain selection. Mirrors how inline feedback
-   * only re-evaluates when an attempt is processed, so a freshly-picked answer
-   * doesn't flip `done` until the candidate ends the attempt.
+   * Written from #handleItemContextUpdated when processResponse ends an attempt —
+   * never on a plain selection. Mirrors how inline feedback only re-evaluates
+   * when an attempt is processed, so a freshly-picked answer doesn't flip `done`
+   * until the candidate ends the attempt.
    */
   #correctness = new Map<string, 'unknown' | 'correct' | 'incorrect'>();
 
@@ -90,6 +90,7 @@ export class TestNavigation extends LitElement {
     this.addEventListener('qti-assessment-item-connected', this.#handleItemConnected.bind(this));
 
     this.addEventListener('qti-interaction-changed', this.#handleInteractionChanged.bind(this));
+    this.addEventListener('qti-item-context-updated', this.#handleItemContextUpdated.bind(this));
 
     this.addEventListener('test-end-attempt', this.#handleTestEndAttempt.bind(this));
     this.addEventListener('test-show-correct-response', this.#handleTestShowCorrectResponse.bind(this));
@@ -116,19 +117,23 @@ export class TestNavigation extends LitElement {
     const qtiAssessmentItemEl = qtiItemEl.assessmentItem;
     const reportValidityAfterScoring = this.configContext?.reportValidityAfterScoring === true ? true : false;
     qtiAssessmentItemEl.processResponse(true, reportValidityAfterScoring);
-    this.#latchCorrectness(this._sessionContext?.navItemRefId);
   }
 
   /**
-   * Record the correctness of an item's just-ended attempt, keyed by item-ref id.
-   * Read from the test context (which carries each response's qti-correct-response);
-   * by the time an attempt is ended the submitted RESPONSE has already settled
-   * there, so this judges the submission — not a later mid-attempt selection.
+   * Latch an item's correctness whenever it has just ended an attempt.
+   * processResponse — fired by test-end-attempt, autoscore, or an in-item
+   * end-attempt interaction — flags its context update with `responseProcessed`;
+   * a plain selection updates the context without it, so `done` can't flip until
+   * the candidate actually ends the attempt. The event carries the freshly
+   * processed context (with each response's qti-correct-response), so judging it
+   * needs no SCORE outcome.
    */
-  #latchCorrectness(refId: string | undefined): void {
-    if (!refId) return;
-    const itemContext = this._testContext?.items.find(i => i.identifier === refId);
-    if (itemContext) this.#correctness.set(refId, this.#assessCorrectness(itemContext));
+  #handleItemContextUpdated(event: CustomEvent<{ itemContext: ItemContext; responseProcessed?: boolean }>) {
+    if (!event.detail?.responseProcessed) return;
+    const itemContext = event.detail.itemContext;
+    if (itemContext?.identifier) {
+      this.#correctness.set(itemContext.identifier, this.#assessCorrectness(itemContext));
+    }
   }
 
   /**
@@ -181,7 +186,6 @@ export class TestNavigation extends LitElement {
       ) {
         const reportValidityAfterScoring = this.configContext?.reportValidityAfterScoring === true ? true : false;
         assessmentItem.processResponse(true, reportValidityAfterScoring);
-        this.#latchCorrectness(assessmentItem.assessmentItemRefId);
       }
     }
   }
@@ -487,10 +491,10 @@ export class TestNavigation extends LitElement {
                   rawMaxScore === undefined || rawMaxScore === null ? null : parseFloat(rawMaxScore?.toString());
 
                 // Correctness comes from the last *ended attempt* (#correctness),
-                // latched after every processResponse (test-end-attempt + autoscore) —
-                // never from a live mid-attempt selection. On a restored session no
-                // attempt is ended this run, so seed it once from the persisted
-                // context, which still holds the submitted response.
+                // latched in #handleItemContextUpdated — never from a live
+                // mid-attempt selection. On a restored session no attempt is ended
+                // this run, so seed it once from the persisted context, which still
+                // holds the submitted response.
                 let correctness = this.#correctness.get(computedItem.identifier);
                 if (correctness === undefined) {
                   correctness = itemContext ? this.#assessCorrectness(itemContext) : 'unknown';
