@@ -15,6 +15,8 @@ export type ComputedItem = ComputedItemContext & {
   valid?: boolean;
   isDefaultResponse?: boolean;
   done?: boolean;
+  /** Last *ended attempt* reached the optimal outcome (best achievable score / correct response). */
+  optimal?: boolean;
 };
 
 export type ComputedContext = {
