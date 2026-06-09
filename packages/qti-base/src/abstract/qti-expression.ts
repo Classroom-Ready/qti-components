@@ -4,10 +4,12 @@ import { state } from 'lit/decorators.js';
 
 import { itemContext } from '../context/qti-assessment-item.context';
 import { qtiContext } from '../context/qti.context';
+import { testContext } from '../context/test.context';
 
 import type { QtiContext, QtiContextType } from '../context/qti.context';
 import type { ResponseVariable, VariableDeclaration } from '../lib/variables';
 import type { ItemContext } from '../context/item.context';
+import type { TestContext } from '../context/test.context';
 
 export interface QtiExpressionBase<T> {
   // get assessmentItem(): QtiAssessmentItem;
@@ -49,6 +51,28 @@ export abstract class QtiExpression<T> extends LitElement implements QtiExpressi
   @state()
   protected qtiContext?: QtiContext;
 
+  @consume({ context: testContext, subscribe: true })
+  @state()
+  protected _testContext?: TestContext;
+
+  /**
+   * Resolve a declared variable from the closest available scope: item-level
+   * first, then the test-level outcome variables. Mirrors qti-printed-variable,
+   * so expressions used in an assessmentTest's outcome processing can reference
+   * test-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the
+   * QTI variable expression is specified to do. Returns null when unresolved
+   * rather than throwing, so callers degrade gracefully.
+   */
+  protected resolveVariable(
+    identifier: string,
+  ): VariableDeclaration<string | string[] | null> | null {
+    return (
+      this.context?.variables.find(v => v.identifier === identifier) ??
+      this._testContext?.testOutcomeVariables?.find(v => v.identifier === identifier) ??
+      null
+    );
+  }
+
   getVariables = (): (ResponseVariable | VariableDeclaration<QtiContextType>)[] =>
     // FIXME: if this itself is multiple, this will never enter the qti-multiple switch
     // See this example here: https://github.com/1EdTech/qti-examples/blob/master/qtiv3-examples/packaging/items/Example05-feedbackBlock-adaptive.xml
@@ -88,8 +112,7 @@ export abstract class QtiExpression<T> extends LitElement implements QtiExpressi
               } as VariableDeclaration<QtiContextType>;
             }
 
-            const variable = this.context.variables.find(v => v.identifier === identifier) || null;
-            return variable;
+            return this.resolveVariable(identifier);
           }
           case 'qti-multiple': {
             const multiple = e as QtiExpression<ResponseVariable[]>;
