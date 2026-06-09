@@ -148,15 +148,16 @@ export const MaxAttemptsAt2: Story = {
     // End attempt should be enabled before any attempt
     await waitFor(() => expect(endAttemptButton).toBeEnabled());
 
-    // Select a choice and submit first attempt
+    // Select a *wrong* choice (suboptimal) and submit first attempt — a better
+    // attempt is still possible, so attempts-remaining keeps the button enabled.
     const item = await getAssessmentItemFromTestContainerByDataTitle(canvasElement, 'Unattended Luggage');
-    const choice = item.querySelector('qti-simple-choice');
-    choice.click();
+    const wrongChoice = item.querySelector('qti-simple-choice[identifier="ChoiceC"]') as HTMLElement;
+    wrongChoice.click();
 
     endAttemptButton.click();
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    // After 1 attempt with max-attempts=2, end attempt should still be enabled
+    // After 1 suboptimal attempt with max-attempts=2, end attempt should still be enabled
     await waitFor(() => expect(endAttemptButton).toBeEnabled());
 
     // Submit second attempt
@@ -164,6 +165,37 @@ export const MaxAttemptsAt2: Story = {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // After 2 attempts with max-attempts=2, end attempt should be disabled
+    await waitFor(() => expect(endAttemptButton).toBeDisabled());
+  }
+};
+
+export const OptimalDisablesWithAttemptsLeft: Story = {
+  render: args => itemSessionControlTemplate(args),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // wait for items to load
+    await getAssessmentItemsFromTestContainer(canvasElement);
+
+    // Navigate to the max-attempts=2 item
+    const max2Link = await canvas.findByShadowText('Max2');
+    max2Link.click();
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const endAttemptButton = await canvas.findByShadowText('End Attempt');
+
+    // End attempt should be enabled before any attempt
+    await waitFor(() => expect(endAttemptButton).toBeEnabled());
+
+    // Select the *correct* choice (ChoiceA → SCORE reaches MAXSCORE = optimal)
+    const item = await getAssessmentItemFromTestContainerByDataTitle(canvasElement, 'Unattended Luggage');
+    const correctChoice = item.querySelector('qti-simple-choice[identifier="ChoiceA"]') as HTMLElement;
+    correctChoice.click();
+
+    endAttemptButton.click();
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Last submission was optimal — disabled even though 1 of 2 attempts remain
     await waitFor(() => expect(endAttemptButton).toBeDisabled());
   }
 };
