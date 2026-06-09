@@ -519,7 +519,13 @@ export class TestNavigation extends LitElement {
                   valid,
                   isDefaultResponse,
                   maxScore,
-                  done
+                  done,
+                  // Reflects the last *ended* attempt only. Read the latch directly
+                  // (not the `optimality` local) — the latch is written solely on
+                  // responseProcessed / restore-seed (line above, guarded by
+                  // numAttempts > 0), so a freshly-picked mid-attempt selection
+                  // computed live is never stored and never counts as optimal.
+                  optimal: this.#optimality.get(computedItem.identifier) === 'optimal'
                   // type,
                   // correct,
                   // incorrect,
