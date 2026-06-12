@@ -19740,7 +19740,7 @@
             },
             {
               "kind": "method",
-              "name": "toggleCorrectResponse",
+              "name": "toggleInternalCorrectResponse",
               "privacy": "public",
               "return": {
                 "type": {
@@ -19756,7 +19756,7 @@
                 }
               ],
               "type": {
-                "text": "toggleCorrectResponse(show: boolean) => void"
+                "text": "toggleInternalCorrectResponse(show: boolean) => void"
               }
             }
           ],
