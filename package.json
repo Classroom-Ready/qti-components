@@ -171,7 +171,8 @@
   },
   "pnpm": {
     "overrides": {
-      "basic-ftp": "^5.2.0"
+      "basic-ftp": "^5.2.0",
+      "shell-quote@<1.8.4": "1.8.4"
     }
   },
   "msw": {
