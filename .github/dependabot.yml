@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Watch JS/TS dependencies on the classroomready branch (the team's working
+  # branch) rather than the default branch. Dependabot reads this config file
+  # from the default branch (main) but raises version-update PRs against, and
+  # reads manifests from, the target branch below.
+  - package-ecosystem: "npm" # also covers pnpm (pnpm-lock.yaml)
+    directory: "/"
+    target-branch: "classroomready"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      # Collapse low-risk minor/patch bumps into a single PR to cut noise.
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
