@@ -9,10 +9,3 @@ updates:
     target-branch: "classroomready"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-    groups:
-      # Collapse low-risk minor/patch bumps into a single PR to cut noise.
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
