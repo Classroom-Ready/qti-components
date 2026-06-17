@@ -63,7 +63,7 @@ export class QtiOrderInteraction extends DragDropSlottedSortableMixin(SlottedBas
       </div>`;
   }
 
-  public override toggleCorrectResponse(show: boolean): void {
+  public override toggleInternalCorrectResponse(show: boolean): void {
     // Always start by removing old correct answers
     this.shadowRoot.querySelectorAll('.correct-option').forEach(option => option.remove());
 
