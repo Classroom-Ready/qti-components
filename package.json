@@ -167,11 +167,11 @@
   "homepage": "https://github.com/Citolab/qti-components#readme",
   "overrides": {
     "storybook": "$storybook",
-    "basic-ftp": "^5.2.0"
+    "basic-ftp@<5.2.2": "5.2.2"
   },
   "pnpm": {
     "overrides": {
-      "basic-ftp": "^5.2.0"
+      "basic-ftp@<5.2.2": "5.2.2"
     }
   },
   "msw": {
