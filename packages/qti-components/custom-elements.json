@@ -27113,7 +27113,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -28974,7 +28974,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               },
               "inheritedFrom": {
                 "name": "QtiFeedback",
@@ -29195,7 +29195,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               },
               "inheritedFrom": {
                 "name": "QtiFeedback",
@@ -29471,7 +29471,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               },
               "inheritedFrom": {
                 "name": "QtiFeedback",
@@ -42724,6 +42724,14 @@
           "name": "*",
           "declaration": {
             "name": "*",
+            "module": "packages/qti-test/src/components/test-show-feedback/test-show-feedback"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
             "module": "packages/qti-test/src/components/test-paging-buttons-stamp/test-paging-buttons-stamp"
           }
         },
@@ -43497,13 +43505,23 @@
           "members": [
             {
               "kind": "field",
+              "name": "_available",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "For `access=\"atEnd\"`: whether the feedback's outcome has matched and it is\nready to be shown. atEnd feedback is no longer shown the moment it becomes\navailable — instead a test-show-feedback button navigates the candidate to\nit. `during` feedback ignores this and shows immediately, as before."
+            },
+            {
+              "kind": "field",
               "name": "_computedContext",
               "type": {
                 "text": "ComputedContext | undefined"
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               },
               "inheritedFrom": {
                 "name": "QtiFeedback",
@@ -43540,6 +43558,17 @@
             },
             {
               "kind": "method",
+              "name": "#outcomeMatches",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this feedback's outcome variable currently includes its identifier."
+            },
+            {
+              "kind": "method",
               "name": "#sessionControlAllowsFeedback",
               "privacy": "private",
               "return": {
@@ -43551,6 +43580,31 @@
                 "name": "QtiFeedback",
                 "module": "packages/qti-base/src/abstract/qti-feedback.ts"
               }
+            },
+            {
+              "kind": "method",
+              "name": "#setAvailable",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "available",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "partId",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Update availability and announce the change so test-show-feedback can enable."
             },
             {
               "kind": "method",
@@ -43690,6 +43744,24 @@
               }
             }
           ],
+          "events": [
+            {
+              "name": "qti-register-feedback",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "inheritedFrom": {
+                "name": "QtiFeedback",
+                "module": "packages/qti-base/src/abstract/qti-feedback.ts"
+              }
+            },
+            {
+              "name": "qti-test-feedback-availability-changed",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
           "attributes": [
             {
               "name": "access",
@@ -43744,18 +43816,6 @@
           },
           "tagName": "qti-test-feedback",
           "customElement": true,
-          "events": [
-            {
-              "name": "qti-register-feedback",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "inheritedFrom": {
-                "name": "QtiFeedback",
-                "module": "packages/qti-base/src/abstract/qti-feedback.ts"
-              }
-            }
-          ],
           "modulePath": "packages/qti-test/src/components/qti-test-feedback/qti-test-feedback.ts",
           "definitionPath": "packages/qti-test/src/components/qti-test-feedback/qti-test-feedback.ts",
           "cssProperties": [],
@@ -44486,7 +44546,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             }
           ],
@@ -44671,6 +44731,23 @@
             },
             {
               "kind": "field",
+              "name": "#availableFeedbacks",
+              "privacy": "private",
+              "default": "new Map<string, string | null>()",
+              "description": "atEnd feedbacks that have announced themselves available, keyed by identifier → partId."
+            },
+            {
+              "kind": "method",
+              "name": "#availableFeedbacksList",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "AvailableFeedback[]"
+                }
+              }
+            },
+            {
+              "kind": "field",
               "name": "#endedParts",
               "privacy": "private",
               "default": "new Set<string>()",
@@ -44694,6 +44771,25 @@
                 }
               ],
               "description": "Extract default values from a qti-context-declaration element"
+            },
+            {
+              "kind": "method",
+              "name": "#handleFeedbackAvailabilityChanged",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "QtiTestFeedbackAvailabilityChangedEvent"
+                  }
+                }
+              ],
+              "description": "Record (or clear) an atEnd feedback's availability and rebuild the computed\ncontext so test-show-feedback can react. Owned here because test-navigation\nalready provides computedContext to the navigation buttons."
             },
             {
               "kind": "method",
@@ -44910,7 +45006,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -45107,7 +45203,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -45213,7 +45309,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -45328,7 +45424,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -45410,7 +45506,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             }
           ],
@@ -45460,7 +45556,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             }
           ],
@@ -45523,7 +45619,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -45625,7 +45721,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -45717,7 +45813,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -45878,7 +45974,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -46011,6 +46107,166 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Navigates the candidate to an `access=\"atEnd\"` qti-test-feedback once it has\nbecome available (its end-of-part / end-of-test outcome has matched). The\nbutton is disabled until then, so a host can keep it hidden until enabled.\n\nClicking dispatches a `feedback` navigation request, which clears the current\nassessment item and shows the feedback. Navigating to any item afterwards (or\nmoving into a later test-part) hides the feedback again.",
+          "name": "TestShowFeedback",
+          "members": [
+            {
+              "kind": "method",
+              "name": "_handleComputedContextChange",
+              "parameters": [
+                {
+                  "name": "_oldValue",
+                  "type": {
+                    "text": "ComputedContext"
+                  }
+                },
+                {
+                  "name": "newValue",
+                  "type": {
+                    "text": "ComputedContext"
+                  }
+                }
+              ],
+              "type": {
+                "text": "_handleComputedContextChange(_oldValue: ComputedContext, newValue: ComputedContext) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_internalDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "public",
+              "default": "true",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "_requestFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "#feedbackId",
+              "privacy": "private",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Identifier of the feedback to navigate to, set whenever one is available."
+            },
+            {
+              "kind": "field",
+              "name": "#internals",
+              "privacy": "private",
+              "type": {
+                "text": "ElementInternals"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ariaLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Show feedback'"
+            },
+            {
+              "kind": "field",
+              "name": "computedContext",
+              "type": {
+                "text": "ComputedContext"
+              },
+              "privacy": "private",
+              "parsedType": {
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "role",
+              "type": {
+                "text": "string"
+              },
+              "default": "'button'"
+            },
+            {
+              "kind": "field",
+              "name": "sessionContext",
+              "type": {
+                "text": "SessionContext"
+              },
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "name": "qti-request-navigation",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "fieldName": "_internalDisabled"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "test-show-feedback",
+          "customElement": true,
+          "modulePath": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts",
+          "definitionPath": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "test-show-feedback",
+          "declaration": {
+            "name": "TestShowFeedback",
+            "module": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TestShowFeedback",
+          "declaration": {
+            "name": "TestShowFeedback",
+            "module": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/qti-test/src/components/test-stamp/test-stamp.ts",
       "declarations": [
         {
@@ -46026,7 +46282,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
