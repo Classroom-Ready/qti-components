@@ -13,6 +13,7 @@ import {
 } from '../../../../../tools/testing/test-utils';
 
 import type { QtiTestFeedback } from './qti-test-feedback';
+import type { TestShowFeedback } from '../test-show-feedback/test-show-feedback';
 import type { QtiPrintedVariable } from '@qti-components/processing';
 import type { QtiChoiceInteraction } from '@qti-components/choice-interaction';
 import type { QtiSimpleChoice } from '@qti-components/interactions-core';
@@ -29,12 +30,17 @@ const meta: Meta<QtiTestFeedback> = {
 };
 export default meta;
 
+/** The candidate-facing "How Did I Do?" button that reveals atEnd feedback. */
+const showFeedbackButton = (canvasElement: HTMLElement): TestShowFeedback =>
+  canvasElement.querySelector<TestShowFeedback>('test-show-feedback')!;
+
 export const AtTestEnd: Story = {
   render: () => html`
     <qti-test navigate="item">
       <test-navigation>
         <test-container test-url="/assets/qti-test-feedback/atend.xml"></test-container>
         <test-end-attempt>End Attempt</test-end-attempt>
+        <test-show-feedback>How Did I Do?</test-show-feedback>
       </test-navigation>
     </qti-test>
   `,
@@ -48,16 +54,19 @@ export const AtTestEnd: Story = {
       if (!fb) throw new Error('qti-test-feedback not connected yet');
       return fb;
     });
+    const showBtn = showFeedbackButton(canvasElement);
 
-    // Before any item is submitted, atEnd feedback must not be shown.
+    // Before any item is submitted, atEnd feedback must not be shown and the
+    // "How Did I Do?" button must be disabled (so a host can keep it hidden).
     expect(feedback.access).toBe('atEnd');
     expect(feedback.showStatus).not.toBe('on');
+    expect(showBtn.hasAttribute('disabled')).toBe(true);
     const feedbackText = await canvas.findByShadowText('End-of-test feedback.');
     expect(feedbackText.assignedSlot).not.toBeVisible();
 
     // Answer the question and end the attempt. With every scorable item now
-    // answered, end-of-test outcome processing fires automatically and
-    // evaluates the atEnd feedback.
+    // answered, end-of-test outcome processing fires automatically — but the
+    // feedback only becomes *available* (the button enables); it is not shown.
     const item = await waitFor(async () => {
       const el = await getAssessmentItemFromTestContainerByDataTitle(canvasElement, 'Question (1 pt)');
       if (!el) throw new Error('Question not loaded yet');
@@ -69,8 +78,18 @@ export const AtTestEnd: Story = {
     const endAttemptBtn = await canvas.findByShadowText('End Attempt');
     endAttemptBtn.click();
 
+    await waitFor(() => expect(showBtn.hasAttribute('disabled')).toBe(false));
+    expect(feedback.showStatus).not.toBe('on');
+    expect(feedbackText.assignedSlot).not.toBeVisible();
+
+    // Clicking "How Did I Do?" navigates away from the item to the feedback.
+    showBtn.click();
     await waitFor(() => expect(feedback.showStatus).toBe('on'));
     await waitFor(() => expect(feedbackText.assignedSlot).toBeVisible());
+    // Navigating to feedback clears the on-screen assessment item.
+    await waitFor(() => expect(item.isConnected).toBe(false));
+    // While viewing the feedback the button is disabled — nowhere new to go.
+    await waitFor(() => expect(showBtn.hasAttribute('disabled')).toBe(true));
   }
 };
 
@@ -80,6 +99,7 @@ const linearSumTemplate = () => html`
       <test-container test-url="/assets/qti-test-feedback/sum.xml"></test-container>
       <test-end-attempt id="end-attempt-btn">End Attempt</test-end-attempt>
       <test-next id="next-btn">Next</test-next>
+      <test-show-feedback>How Did I Do?</test-show-feedback>
     </test-navigation>
   </qti-test>
 `;
@@ -101,12 +121,15 @@ const playLinearSum = async ({
 
   const endAttemptBtn = await canvas.findByShadowText('End Attempt');
   const nextBtn = await canvas.findByShadowText('Next');
+  const showBtn = showFeedbackButton(canvasElement);
   const feedback = assessmentTest.querySelector<QtiTestFeedback>('qti-test-feedback');
 
-  // Initially the test feedback must not be visible.
+  // Initially the test feedback must not be visible and the button disabled.
   expect(feedback.showStatus).not.toBe('on');
+  expect(showBtn.hasAttribute('disabled')).toBe(true);
 
-  // Answer Q1, then submit. With Q2 untouched, the test feedback stays hidden.
+  // Answer Q1, then submit. With Q2 untouched, the test feedback stays
+  // unavailable.
   const q1 = await waitFor(async () => {
     const item = await getAssessmentItemFromTestContainerByDataTitle(canvasElement, 'Question (1 pt)');
     if (!item) throw new Error('Q1 not loaded yet');
@@ -116,6 +139,7 @@ const playLinearSum = async ({
   endAttemptBtn.click();
   await waitFor(() => expect(nextBtn).toBeEnabled());
   expect(feedback.showStatus).not.toBe('on');
+  expect(showBtn.hasAttribute('disabled')).toBe(true);
 
   // Advance to Q2 (linear navigation).
   nextBtn.click();
@@ -128,14 +152,20 @@ const playLinearSum = async ({
   endAttemptBtn.click();
 
   // With both items now submitted, end-of-test outcome processing fires
-  // automatically and the atEnd feedback evaluates.
-  await waitFor(() => expect(feedback.showStatus).toBe('on'));
+  // automatically and the atEnd feedback becomes available — the button enables
+  // but the feedback is not shown until the candidate asks for it.
+  await waitFor(() => expect(showBtn.hasAttribute('disabled')).toBe(false));
+  expect(feedback.showStatus).not.toBe('on');
 
   // The atEnd feedback prints TEST_SCORE / TEST_MAX_SCORE — the sum of the
   // per-item SCORE values over the sum of the per-item MAXSCORE values.
   const [scoreVar, maxScoreVar] = feedback.querySelectorAll<QtiPrintedVariable>('qti-printed-variable');
   expect(scoreVar.calculate().value).toBe(expectedTotal);
   expect(maxScoreVar.calculate().value).toBe('3');
+
+  // Reveal the feedback via the "How Did I Do?" button.
+  showBtn.click();
+  await waitFor(() => expect(feedback.showStatus).toBe('on'));
   await waitFor(() => {
     expect(scoreVar.shadowRoot?.textContent?.trim()).toBe(expectedTotal);
     expect(maxScoreVar.shadowRoot?.textContent?.trim()).toBe('3');
@@ -180,8 +210,8 @@ export const OutcomeProcessing2: Story = {
  * whole test. Both signals fire automatically: when every scorable item in a
  * test-part has been answered the part-end outcome processing runs, and once
  * every test-part has fired its part-end the test-end fires too. The
- * part-scoped feedback also disappears once the candidate navigates into a
- * different test-part — it's the "end of this part" screen, nothing more.
+ * part-scoped feedback is offered (via test-show-feedback) once available and
+ * disappears once the candidate navigates into a different test-part.
  */
 export const AtPartEnd: Story = {
   parameters: { testTimeout: 30000 },
@@ -190,6 +220,7 @@ export const AtPartEnd: Story = {
       <test-navigation>
         <test-container test-url="/assets/qti-test-feedback/parts.xml"></test-container>
         <test-end-attempt id="end-attempt-btn">End Attempt</test-end-attempt>
+        <test-show-feedback>How Did I Do?</test-show-feedback>
         <test-item-link item-id="P2Q1" id="go-to-part-2">Go to Part 2</test-item-link>
       </test-navigation>
     </qti-test>
@@ -201,6 +232,7 @@ export const AtPartEnd: Story = {
 
     const endAttemptBtn = await canvas.findByShadowText('End Attempt');
     const goToPart2Btn = await canvas.findByShadowText('Go to Part 2');
+    const showBtn = showFeedbackButton(canvasElement);
 
     const partFeedback = assessmentTest.querySelector<QtiTestFeedback>(
       'qti-test-part[identifier="TP1"] qti-test-feedback'
@@ -209,47 +241,43 @@ export const AtPartEnd: Story = {
     expect(partFeedback).toBeTruthy();
     expect(testFeedback).toBeTruthy();
 
-    // Initially both feedbacks are hidden.
+    // Initially both feedbacks are hidden and nothing is offered.
     expect(partFeedback.showStatus).not.toBe('on');
     expect(testFeedback.showStatus).not.toBe('on');
+    expect(showBtn.hasAttribute('disabled')).toBe(true);
 
     // Answer Part 1's question by selecting a choice — but don't end the
-    // attempt yet. The part must not yet be considered complete: a radio
-    // click flips completionStatus to 'completed' but the attempt has not
-    // been ended, so part-end outcome processing must not fire.
-    // Both items share the same item file (Question (1 pt)), so we look them
-    // up by their item-ref identifier instead of by title.
+    // attempt yet. The part must not yet be considered complete.
     const p1q1 = await getAssessmentItemFromTestContainerByItemRefId(canvasElement, 'P1Q1');
     within(p1q1.querySelector<QtiChoiceInteraction>('qti-choice-interaction'))
       .getByText<QtiSimpleChoice>('Correct')
       .click();
-    // Give any reactive listeners a tick to settle; assert nothing fired.
     await new Promise(resolve => setTimeout(resolve, 50));
+    expect(showBtn.hasAttribute('disabled')).toBe(true);
+
+    // End the attempt → the part is fully attempted, part-end fires
+    // automatically, and the part-scoped feedback becomes available. The test
+    // is not over yet (TP2 untouched), so no test-root feedback is offered.
+    endAttemptBtn.click();
+    await waitFor(() => expect(showBtn.hasAttribute('disabled')).toBe(false));
     expect(partFeedback.showStatus).not.toBe('on');
     expect(testFeedback.showStatus).not.toBe('on');
 
-    // End the attempt → now the part is fully attempted, part-end fires
-    // automatically, and only the part-scoped feedback evaluates. The test
-    // is not over yet (TP2 untouched), so the test-root feedback stays hidden.
-    endAttemptBtn.click();
+    // Reveal the part feedback.
+    showBtn.click();
     await waitFor(() => expect(partFeedback.showStatus).toBe('on'));
-    expect(testFeedback.showStatus).not.toBe('on');
     const partText = await canvas.findByShadowText('Part 1 complete.');
     expect(partText.assignedSlot).toBeVisible();
     const testText = await canvas.findByShadowText('Test complete.');
     expect(testText.assignedSlot).not.toBeVisible();
 
-    // Navigate into TP2 via <test-item-link> — the standard user-facing
-    // component for jumping to a specific item. In linear mode the navigation
-    // mixin only allows jumping to the immediately-next item in DOM order, so
-    // P2Q1 (first item of TP2) is reachable from the end of TP1.
+    // Navigate into TP2 via <test-item-link> — moving on hides the TP1-scoped
+    // feedback and the button stops offering it.
     goToPart2Btn.click();
-
     const p2q1 = await getAssessmentItemFromTestContainerByItemRefId(canvasElement, 'P2Q1');
-
-    // Moving into TP2 hides the TP1-scoped feedback.
     await waitFor(() => expect(partFeedback.showStatus).not.toBe('on'));
     expect(partText.assignedSlot).not.toBeVisible();
+    await waitFor(() => expect(showBtn.hasAttribute('disabled')).toBe(true));
 
     within(p2q1.querySelector<QtiChoiceInteraction>('qti-choice-interaction'))
       .getByText<QtiSimpleChoice>('Correct')
@@ -257,8 +285,10 @@ export const AtPartEnd: Story = {
     endAttemptBtn.click();
 
     // Both parts now ended → end-of-test fires automatically. The test-root
-    // atEnd feedback evaluates; the part-scoped feedback stays hidden (we've
-    // moved on from TP1).
+    // atEnd feedback becomes available; reveal it via the button. The
+    // part-scoped feedback stays hidden (we've moved on from TP1).
+    await waitFor(() => expect(showBtn.hasAttribute('disabled')).toBe(false));
+    showBtn.click();
     await waitFor(() => expect(testFeedback.showStatus).toBe('on'));
     expect(partFeedback.showStatus).not.toBe('on');
     await waitFor(() => expect(testText.assignedSlot).toBeVisible());
@@ -271,15 +301,15 @@ const twoMaxAttemptsTemplate = () => html`
     <test-navigation>
       <test-container test-url="/assets/qti-test-feedback/maxattempts.xml"></test-container>
       <test-end-attempt>End Attempt</test-end-attempt>
+      <test-show-feedback>How Did I Do?</test-show-feedback>
     </test-navigation>
   </qti-test>
 `;
 
 /**
  * Drive a single-question maxAttempts=2 test through the supplied attempt
- * sequence and assert the part feedback's visibility after each step.
- * `attempts[i]` is the choice text for attempt i+1; `expectedAfterEach[i]`
- * is whether the part-end feedback should be visible after that submission.
+ * sequence and assert whether the part feedback is *offered* (the
+ * test-show-feedback button is enabled) after each submission.
  */
 const playMaxAttempts = async ({
   canvasElement,
@@ -295,9 +325,11 @@ const playMaxAttempts = async ({
   await getAssessmentItemsFromTestContainer(canvasElement);
 
   const endAttemptBtn = await canvas.findByShadowText('End Attempt');
+  const showBtn = showFeedbackButton(canvasElement);
   const feedback = assessmentTest.querySelector<QtiTestFeedback>('qti-test-part[identifier="TP1"] qti-test-feedback');
   expect(feedback).toBeTruthy();
   expect(feedback.showStatus).not.toBe('on');
+  expect(showBtn.hasAttribute('disabled')).toBe(true);
 
   const q = await waitFor(async () => {
     const item = await getAssessmentItemFromTestContainerByDataTitle(canvasElement, 'Question (1 pt)');
@@ -312,14 +344,23 @@ const playMaxAttempts = async ({
     // Let the part-completion check run.
     await new Promise(resolve => setTimeout(resolve, 50));
     if (partFeedbackExpected[i]) {
-      await waitFor(() => expect(feedback.showStatus).toBe('on'));
+      await waitFor(() => expect(showBtn.hasAttribute('disabled')).toBe(false));
+      // Feedback is offered but not shown until requested.
+      expect(feedback.showStatus).not.toBe('on');
     } else {
+      expect(showBtn.hasAttribute('disabled')).toBe(true);
       expect(feedback.showStatus).not.toBe('on');
     }
   }
+
+  // Once offered, the button reveals the feedback.
+  if (partFeedbackExpected[partFeedbackExpected.length - 1]) {
+    showBtn.click();
+    await waitFor(() => expect(feedback.showStatus).toBe('on'));
+  }
 };
 
-// Wrong, then wrong again → part feedback only shows after the second submit
+// Wrong, then wrong again → part feedback only offered after the second submit
 // (maxAttempts reached).
 export const OutOfAttempts: Story = {
   parameters: { testTimeout: 30000 },
@@ -332,7 +373,7 @@ export const OutOfAttempts: Story = {
     })
 };
 
-// Right on the first try → part feedback shows immediately after that submit.
+// Right on the first try → part feedback offered immediately after that submit.
 export const CorrectAttempt: Story = {
   parameters: { testTimeout: 30000 },
   render: twoMaxAttemptsTemplate,

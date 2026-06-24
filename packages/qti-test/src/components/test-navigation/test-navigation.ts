@@ -5,6 +5,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { computedContext, configContext, qtiContext, sessionContext, testContext } from '@qti-components/base';
 
 import type {
+  AvailableFeedback,
   ComputedContext,
   ComputedItem,
   ConfigContext,
@@ -15,6 +16,7 @@ import type {
   SessionContext,
   TestContext
 } from '@qti-components/base';
+import type { QtiTestFeedbackAvailabilityChangedEvent } from '../qti-test-feedback/qti-test-feedback';
 import type { PropertyValues } from 'lit';
 import type { QtiAssessmentItem } from '@qti-components/elements';
 import type { QtiAssessmentItemRef } from '../qti-assessment-item-ref/qti-assessment-item-ref';
@@ -91,6 +93,9 @@ export class TestNavigation extends LitElement {
    */
   #optimality = new Map<string, ItemOptimality>();
 
+  /** atEnd feedbacks that have announced themselves available, keyed by identifier → partId. */
+  #availableFeedbacks = new Map<string, string | null>();
+
   constructor() {
     super();
     this.addEventListener('qti-assessment-test-connected', this.#handleTestConnected.bind(this));
@@ -103,12 +108,37 @@ export class TestNavigation extends LitElement {
     this.addEventListener('test-show-correct-response', this.#handleTestShowCorrectResponse.bind(this));
     this.addEventListener('test-show-candidate-correction', this.#handleTestShowCandidateCorrection.bind(this));
     this.addEventListener('test-update-outcome-variable', this.#handleTestUpdateOutcomeVariable.bind(this));
+    this.addEventListener('qti-test-feedback-availability-changed', this.#handleFeedbackAvailabilityChanged.bind(this));
     // A fresh test invalidates the per-test completion latches.
     this.addEventListener('qti-testdoc-loaded', () => {
       this.#endedParts.clear();
       this.#testEnded = false;
       this.#optimality.clear();
+      this.#availableFeedbacks.clear();
     });
+  }
+
+  /**
+   * Record (or clear) an atEnd feedback's availability and rebuild the computed
+   * context so test-show-feedback can react. Owned here because test-navigation
+   * already provides computedContext to the navigation buttons.
+   */
+  #handleFeedbackAvailabilityChanged(event: QtiTestFeedbackAvailabilityChangedEvent): void {
+    const { identifier, partId, available } = event.detail;
+    if (available) {
+      this.#availableFeedbacks.set(identifier, partId);
+    } else {
+      this.#availableFeedbacks.delete(identifier);
+    }
+    // Feedback announces availability synchronously from inside this element's
+    // own willUpdate (the end-of-part/test completion cascade), so a plain
+    // requestUpdate() is absorbed into the in-flight cycle that already read the
+    // old list. Defer to a fresh cycle so computedContext picks up the change.
+    queueMicrotask(() => this.requestUpdate());
+  }
+
+  #availableFeedbacksList(): AvailableFeedback[] {
+    return Array.from(this.#availableFeedbacks, ([identifier, partId]) => ({ identifier, partId }));
   }
 
   /**
@@ -407,6 +437,7 @@ export class TestNavigation extends LitElement {
     this.computedContext = {
       ...this.computedContext,
       view: this._sessionContext?.view,
+      availableFeedbacks: this.#availableFeedbacksList(),
       testParts: this.computedContext.testParts.map(testPart => {
         return {
           ...testPart,
