@@ -88,6 +88,8 @@ export const AtTestEnd: Story = {
     await waitFor(() => expect(feedbackText.assignedSlot).toBeVisible());
     // Navigating to feedback clears the on-screen assessment item.
     await waitFor(() => expect(item.isConnected).toBe(false));
+    // While viewing the feedback the button is disabled — nowhere new to go.
+    await waitFor(() => expect(showBtn.hasAttribute('disabled')).toBe(true));
   }
 };
 

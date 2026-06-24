@@ -75,7 +75,10 @@ export class TestShowFeedback extends LitElement {
     );
 
     this.#feedbackId = candidate?.identifier ?? null;
-    this._internalDisabled = !this.#feedbackId;
+    // Disabled with no feedback to offer, or while the candidate is already
+    // viewing that feedback — there is nowhere new to navigate.
+    const alreadyViewing = this.#feedbackId === (this.sessionContext?.navFeedbackIdentifier ?? null);
+    this._internalDisabled = !this.#feedbackId || alreadyViewing;
   }
 
   protected _requestFeedback(identifier: string): void {

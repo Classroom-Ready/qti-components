@@ -74,6 +74,17 @@ describe('TestShowFeedback', () => {
     expect(el).toBeDisabled();
   });
 
+  it('should be disabled while the candidate is already viewing that feedback', async () => {
+    const el = document.createElement('test-show-feedback') as any;
+    container.appendChild(el);
+
+    el.sessionContext = { navFeedbackIdentifier: 'FB_END' };
+    el.computedContext = baseContext([{ identifier: 'FB_END', partId: null }]);
+    await el.updateComplete;
+
+    expect(el).toBeDisabled();
+  });
+
   it('should dispatch a feedback navigation request with the available identifier on click', async () => {
     const el = document.createElement('test-show-feedback') as any;
     container.appendChild(el);
