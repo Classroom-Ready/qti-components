@@ -3,13 +3,21 @@ packages:
   - packages/*
   - packages/interactions/*
 
-onlyBuiltDependencies:
-  - '@swc/core'
-  - esbuild
-  - msw
-  - puppeteer
-  - rs-module-lexer
-  - unrs-resolver
+# pnpm v11 reads dependency build permissions from `allowBuilds` (a map of
+# matcher -> boolean). It replaces the v10 `onlyBuiltDependencies` list, which
+# v11 ignores — leaving these packages' build scripts blocked.
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  msw: true
+  puppeteer: true
+  rs-module-lexer: true
+  unrs-resolver: true
+
+# pnpm v11 reads `overrides` from here; the package.json `pnpm.overrides` field
+# it used in v10 is no longer read.
+overrides:
+  basic-ftp: '^5.2.0'
 
 patchedDependencies:
   '@wc-toolkit/storybook-helpers@10.2.1': patches/@wc-toolkit__storybook-helpers@10.2.1.patch

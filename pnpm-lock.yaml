@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  basic-ftp: ^5.2.0
+
 patchedDependencies:
   '@wc-toolkit/storybook-helpers@10.2.1': d7e25861091b1575a525784c700836355ac0c12245a3850c2ad9a6fe26e9a380
 

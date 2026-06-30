@@ -43511,7 +43511,7 @@
               },
               "privacy": "private",
               "default": "false",
-              "description": "For `access=\"atEnd\"`: whether the feedback's outcome has matched and it is\nready to be shown. atEnd feedback is no longer shown the moment it becomes\navailable — instead a test-show-feedback button navigates the candidate to\nit. `during` feedback ignores this and shows immediately, as before."
+              "description": "For `access=\"atEnd\"`: whether the feedback's outcome has matched and it is\nready to be shown. While available, the feedback stays hidden until a\ntest-show-feedback button navigates the candidate to it. `during` feedback\nignores this flag and shows the instant its outcome matches."
             },
             {
               "kind": "field",
