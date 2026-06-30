@@ -1,5 +1,5 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["local>Classroom-Ready/renovate-config"],
-  "baseBranches": ["classroomready"]
+  "baseBranchPatterns": ["classroomready"]
 }
