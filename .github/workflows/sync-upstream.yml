@@ -1,0 +1,85 @@
+# Keeps this fork's `main` in sync with upstream `Citolab/qti-components`, then
+# proposes carrying those upstream changes into the long-lived `classroomready`
+# customization branch.
+#
+#   1. sync-main   — merge `upstream/main` into `origin/main` and push.
+#   2. propose-pr  — open (or leave the existing) PR merging `main` into
+#                    `classroomready`, but only when the two branches differ.
+#
+# Runs daily and on demand. A merge conflict in step 1 fails the run so a human
+# resolves it; the propose-pr job only runs once main is updated cleanly.
+
+name: Sync fork with upstream
+
+on:
+  schedule:
+    - cron: "0 7 * * *" # 07:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Never let two syncs race on the same branches.
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: https://github.com/Citolab/qti-components.git
+  TARGET_BRANCH: classroomready
+
+jobs:
+  sync-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge upstream/main into main
+        run: |
+          git remote add upstream "$UPSTREAM_REPO"
+          git fetch upstream main
+          echo "Merging upstream/main into main..."
+          git merge --no-edit upstream/main
+          git push origin main
+
+  propose-pr:
+    needs: sync-main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Open main -> classroomready PR when branches differ
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # main fully contained in the target branch => nothing to carry over.
+          if git merge-base --is-ancestor origin/main "origin/$TARGET_BRANCH"; then
+            echo "main is already contained in $TARGET_BRANCH; nothing to propose."
+            exit 0
+          fi
+
+          existing=$(gh pr list --base "$TARGET_BRANCH" --head main \
+            --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            echo "PR #$existing is already open; it updates automatically as main moves."
+            exit 0
+          fi
+
+          gh pr create \
+            --base "$TARGET_BRANCH" \
+            --head main \
+            --title "Sync: merge upstream changes from main into $TARGET_BRANCH" \
+            --body "Automated by the **Sync fork with upstream** workflow. Carries the latest \`main\` (synced from upstream \`Citolab/qti-components\`) into \`$TARGET_BRANCH\`. Review the upstream changes before merging."
