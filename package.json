@@ -179,7 +179,7 @@
       "public"
     ]
   },
-  "packageManager": "pnpm@11.5.3",
+  "packageManager": "pnpm@11.8.0",
   "sherif": {
     "ignoreRule": [
       "packages-without-package-json"
