@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - classroomready
   push:
     branches:
       - main
@@ -22,7 +23,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.branch || 'main' }}
+          # Empty on pull_request/push events, so checkout uses the default ref
+          # (the PR merge commit / pushed sha) and CI tests the actual change.
+          # workflow_dispatch supplies inputs.branch (defaults to main).
+          ref: ${{ inputs.branch }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
