@@ -80,6 +80,13 @@ export default defineConfig({
       /* this is for the normal spec files, which do not need storybook */
       {
         plugins: [tsconfigPaths()],
+        // The shared setup file imports fast-xml-parser (tools/testing/setup/toEqualXml.js).
+        // Force it into the initial browser-mode prebundle so the optimizer never discovers
+        // it mid-run and triggers a page reload, which drops in-flight test module imports
+        // ("Failed to fetch dynamically imported module" / "Cannot connect to the iframe").
+        optimizeDeps: {
+          include: ['fast-xml-parser']
+        },
         test: {
           name: 'tests',
           setupFiles: ['./tools/testing/setup/index.js'],
