@@ -33,11 +33,26 @@ jobs:
   sync-main:
     runs-on: ubuntu-latest
     steps:
+      # The default GITHUB_TOKEN cannot push to `main`: the org "main protection"
+      # ruleset requires a pull request. The classroomready-reader GitHub App is
+      # a bypass actor on that ruleset, so authenticate the checkout with its
+      # token to push the upstream merge straight to `main` (a plain mirror of
+      # upstream — routing it through a squash/rebase PR would rewrite the
+      # upstream commits and break main's ancestry in classroomready).
+      - name: Get token from GitHub App
+        uses: actions/create-github-app-token@v3
+        id: app_token
+        with:
+          app-id: ${{ secrets.REPO_READONLY_GITHUB_APP_ID }}
+          private-key: ${{ secrets.REPO_READONLY_GITHUB_APP_KEY }}
+          owner: ${{ github.repository_owner }}
+
       - name: Checkout main
         uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ steps.app_token.outputs.token }}
 
       - name: Configure git identity
         run: |
