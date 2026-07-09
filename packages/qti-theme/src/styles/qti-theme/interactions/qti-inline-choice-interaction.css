@@ -1,11 +1,11 @@
 @layer qti-components {
   qti-inline-choice-interaction {
-    &:state(candidate-correct) {
+    &:is(:state(candidate-correct), [data-state~='candidate-correct']) {
       &::part(trigger) {
         background-color: var(--qti-correct);
       }
     }
-    &:state(candidate-incorrect) {
+    &:is(:state(candidate-incorrect), [data-state~='candidate-incorrect']) {
       &::part(trigger) {
         background-color: var(--qti-incorrect);
       }
@@ -19,14 +19,14 @@
         @apply foc;
       }
     }
-    &:not(:state(readonly)):not([readonly])::part(trigger):hover {
+    &:not(:is(:state(readonly), [data-state~='readonly'])):not([readonly])::part(trigger):hover {
       @apply hov;
     }
-    &:state(disabled)::part(trigger),
+    &:is(:state(disabled), [data-state~='disabled'])::part(trigger),
     &[disabled]::part(trigger) {
       @apply dis;
     }
-    &:state(readonly)::part(trigger),
+    &:is(:state(readonly), [data-state~='readonly'])::part(trigger),
     &[readonly]::part(trigger) {
       @apply rdo;
       @apply dis;
@@ -62,7 +62,7 @@
     & qti-inline-choice:focus-visible {
       @apply foc;
     }
-    & qti-inline-choice:state(--checked) {
+    & qti-inline-choice:is(:state(--checked), [data-state~='--checked']) {
       @apply act-bg;
     }
   }

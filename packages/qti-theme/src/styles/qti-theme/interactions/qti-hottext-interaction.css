@@ -16,19 +16,19 @@
       &::part(cha) {
         @apply check-size;
       }
-      &:state(radio)::part(ch) {
+      &:is(:state(radio), [data-state~='radio'])::part(ch) {
         @apply check-radio;
       }
-      &:state(radio):state(--checked)::part(cha) {
+      &:is(:state(radio), [data-state~='radio']):is(:state(--checked), [data-state~='--checked'])::part(cha) {
         @apply check-radio-checked;
       }
-      &:state(checkbox)::part(ch) {
+      &:is(:state(checkbox), [data-state~='checkbox'])::part(ch) {
         @apply check-checkbox;
       }
-      &:state(checkbox):state(--checked)::part(cha) {
+      &:is(:state(checkbox), [data-state~='checkbox']):is(:state(--checked), [data-state~='--checked'])::part(cha) {
         @apply check-checkbox-checked;
       }
-      &:state(correct-response),
+      &:is(:state(correct-response), [data-state~='correct-response']),
       &[data-correct-response='true'] {
         &::after {
           content: '\02714';
@@ -48,7 +48,7 @@
         &::part(ch) {
           display: none;
         }
-        &:state(--checked) {
+        &:is(:state(--checked), [data-state~='--checked']) {
           @apply act;
         }
         &[aria-readonly='true'] {
@@ -71,7 +71,7 @@
         &::part(ch) {
           display: none;
         }
-        &:state(--checked) {
+        &:is(:state(--checked), [data-state~='--checked']) {
           background-color: var(--qti-bg-active);
         }
         &[aria-readonly='true'] {

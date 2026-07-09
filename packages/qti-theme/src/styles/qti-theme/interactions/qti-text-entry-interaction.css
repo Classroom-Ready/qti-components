@@ -1,16 +1,16 @@
 @layer qti-components {
   qti-text-entry-interaction {
-    &:state(candidate-correct) {
+    &:is(:state(candidate-correct), [data-state~='candidate-correct']) {
       &::part(input) {
         background-color: var(--qti-correct);
       }
     }
-    &:state(candidate-partially-correct) {
+    &:is(:state(candidate-partially-correct), [data-state~='candidate-partially-correct']) {
       &::part(input) {
         background-color: var(--qti-partially-correct);
       }
     }
-    &:state(candidate-incorrect) {
+    &:is(:state(candidate-incorrect), [data-state~='candidate-incorrect']) {
       &::part(input) {
         background-color: var(--qti-incorrect);
       }

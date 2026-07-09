@@ -67,13 +67,13 @@ export default css`
   }
 
   /* Candidate correction colors for choices placed inside drop-lists. */
-  drop-list [qti-draggable='true']:state(candidate-correct),
-  [part='qti-simple-choice']:state(candidate-correct) {
+  drop-list [qti-draggable='true']:is(:state(candidate-correct), [data-state~='candidate-correct']),
+  [part='qti-simple-choice']:is(:state(candidate-correct), [data-state~='candidate-correct']) {
     background-color: var(--qti-correct-response, --qti-correct);
   }
 
-  drop-list [qti-draggable='true']:state(candidate-incorrect),
-  [part='qti-simple-choice']:state(candidate-incorrect) {
+  drop-list [qti-draggable='true']:is(:state(candidate-incorrect), [data-state~='candidate-incorrect']),
+  [part='qti-simple-choice']:is(:state(candidate-incorrect), [data-state~='candidate-incorrect']) {
     background-color: var(--qti-incorrect);
   }
 

@@ -1,9 +1,9 @@
 @layer qti-components {
   qti-order-interaction {
-    &:state(--dragzone-active)::part(drags) {
+    &:is(:state(--dragzone-active), [data-state~='--dragzone-active'])::part(drags) {
       @apply act;
     }
-    &:state(--dragzone-enabled)::part(drags) {
+    &:is(:state(--dragzone-enabled), [data-state~='--dragzone-enabled'])::part(drags) {
       @apply dropping;
     }
     &::part(qti-simple-choice),
