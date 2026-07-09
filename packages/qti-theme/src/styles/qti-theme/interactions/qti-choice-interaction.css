@@ -17,19 +17,19 @@
         &::part(ch) {
           display: none;
         }
-        &:state(--checked),
+        &:is(:state(--checked), [data-state~='--checked']),
         &[aria-checked='true'] {
           @apply act;
         }
-        &:state(readonly),
+        &:is(:state(readonly), [data-state~='readonly']),
         &[aria-readonly='true'] {
           @apply rdo;
         }
-        &:state(disabled),
+        &:is(:state(disabled), [data-state~='disabled']),
         &[aria-disabled='true'] {
           @apply dis;
         }
-        &:state(correct-response),
+        &:is(:state(correct-response), [data-state~='correct-response']),
         &[data-correct-response='true'] {
           border: 3px solid var(--qti-correct) !important;
           padding-right: 30px;
@@ -49,43 +49,43 @@
     &:not(.qti-input-control-hidden) {
       & qti-simple-choice {
         @apply check;
-        &:not([aria-disabled='true'], [aria-readonly='true'], :state(--checked)):hover {
+        &:not([aria-disabled='true'], [aria-readonly='true'], :is(:state(--checked), [data-state~='--checked'])):hover {
           @apply hov;
         }
         &:focus {
           @apply foc;
         }
-        &:state(--checked),
+        &:is(:state(--checked), [data-state~='--checked']),
         &[aria-checked='true'] {
           @apply act;
         }
-        &:state(candidate-correct) {
+        &:is(:state(candidate-correct), [data-state~='candidate-correct']) {
           background-color: var(--qti-correct);
         }
-        &:state(candidate-incorrect) {
+        &:is(:state(candidate-incorrect), [data-state~='candidate-incorrect']) {
           background-color: var(--qti-incorrect);
         }
-        &:state(readonly),
+        &:is(:state(readonly), [data-state~='readonly']),
         &[aria-readonly='true'] {
           @apply rdo;
         }
-        &:state(disabled),
+        &:is(:state(disabled), [data-state~='disabled']),
         &[aria-disabled='true'] {
           @apply dis;
         }
         &::part(cha) {
           @apply check-size;
         }
-        &:state(radio)::part(ch) {
+        &:is(:state(radio), [data-state~='radio'])::part(ch) {
           @apply check-radio;
         }
-        &:state(radio):state(--checked)::part(cha) {
+        &:is(:state(radio), [data-state~='radio']):is(:state(--checked), [data-state~='--checked'])::part(cha) {
           @apply check-radio-checked;
         }
-        &:state(checkbox)::part(ch) {
+        &:is(:state(checkbox), [data-state~='checkbox'])::part(ch) {
           @apply check-checkbox;
         }
-        &:state(checkbox):state(--checked)::part(cha) {
+        &:is(:state(checkbox), [data-state~='checkbox']):is(:state(--checked), [data-state~='--checked'])::part(cha) {
           @apply check-checkbox-checked;
         }
       }
@@ -94,7 +94,7 @@
     & qti-simple-choice {
       width: fit-content;
       cursor: pointer;
-      &:state(correct-response),
+      &:is(:state(correct-response), [data-state~='correct-response']),
       &[data-correct-response='true'] {
         &::after {
           content: '\02714';

@@ -9,15 +9,15 @@
         &:focus {
           @apply foc;
         }
-        &:state(--checked),
+        &:is(:state(--checked), [data-state~='--checked']),
         &[aria-checked='true'] {
           @apply act-bor;
         }
-        &:state(--readonly),
+        &:is(:state(--readonly), [data-state~='--readonly']),
         &[aria-readonly='true'] {
           @apply rdo;
         }
-        &:state(--disabled),
+        &:is(:state(--disabled), [data-state~='--disabled']),
         &[aria-disabled='true'] {
           @apply dis;
         }
@@ -27,7 +27,7 @@
         &:focus {
           @apply foc;
         }
-        &:state(--checked),
+        &:is(:state(--checked), [data-state~='--checked']),
         &[aria-checked='true'] {
           @apply act-bor;
         }
@@ -52,7 +52,7 @@
           );
           display: block;
         }
-        &:state(--checked)::after,
+        &:is(:state(--checked), [data-state~='--checked'])::after,
         &[aria-checked='true']::after {
           content: '';
           width: 100%;

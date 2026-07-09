@@ -113,10 +113,10 @@
   }
 
   qti-match-interaction:not(.qti-match-tabular) {
-    &:state(--dragzone-enabled) qti-simple-match-set:first-of-type {
+    &:is(:state(--dragzone-enabled), [data-state~='--dragzone-enabled']) qti-simple-match-set:first-of-type {
       @apply dropping;
     }
-    &:state(--dragzone-active) qti-simple-match-set:first-of-type {
+    &:is(:state(--dragzone-active), [data-state~='--dragzone-active']) qti-simple-match-set:first-of-type {
       @apply act;
     }
     & qti-simple-match-set:first-of-type {
@@ -190,10 +190,10 @@
         }
         & > qti-simple-associable-choice {
           @apply drag;
-          &:state(candidate-correct) {
+          &:is(:state(candidate-correct), [data-state~='candidate-correct']) {
             background-color: var(--qti-correct);
           }
-          &:state(candidate-incorrect) {
+          &:is(:state(candidate-incorrect), [data-state~='candidate-incorrect']) {
             background-color: var(--qti-incorrect);
           }
           &::part(dropslot) {

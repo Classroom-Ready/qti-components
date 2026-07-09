@@ -44,27 +44,27 @@
       }
     }
     &.qti-selections-light {
-      &:state(--dragzone-active)::part(drags) {
+      &:is(:state(--dragzone-active), [data-state~='--dragzone-active'])::part(drags) {
         background-color: var(--qti-light-bg-active);
         border-color: var(--qti-light-border-active);
       }
-      &:state(--dragzone-enabled)::part(drags) {
+      &:is(:state(--dragzone-enabled), [data-state~='--dragzone-enabled'])::part(drags) {
         background-color: var(--qti-light-bg-active);
       }
     }
     &.qti-selections-dark {
-      &:state(--dragzone-active)::part(drags) {
+      &:is(:state(--dragzone-active), [data-state~='--dragzone-active'])::part(drags) {
         background-color: var(--qti-dark-bg-active);
         border-color: var(--qti-dark-border-active);
       }
-      &:state(--dragzone-enabled)::part(drags) {
+      &:is(:state(--dragzone-enabled), [data-state~='--dragzone-enabled'])::part(drags) {
         background-color: var(--qti-dark-bg-active);
       }
     }
-    &:state(--dragzone-active)::part(drags) {
+    &:is(:state(--dragzone-active), [data-state~='--dragzone-active'])::part(drags) {
       @apply act;
     }
-    &:state(--dragzone-enabled)::part(drags) {
+    &:is(:state(--dragzone-enabled), [data-state~='--dragzone-enabled'])::part(drags) {
       @apply dropping;
     }
   }

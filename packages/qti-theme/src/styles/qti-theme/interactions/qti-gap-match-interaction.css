@@ -1,27 +1,27 @@
 @layer qti-components {
   qti-gap-match-interaction {
     &.qti-selections-light {
-      &:state(--dragzone-active)::part(drags) {
+      &:is(:state(--dragzone-active), [data-state~='--dragzone-active'])::part(drags) {
         background-color: var(--qti-light-bg-active);
         border-color: var(--qti-light-border-active);
       }
-      &:state(--dragzone-enabled)::part(drags) {
+      &:is(:state(--dragzone-enabled), [data-state~='--dragzone-enabled'])::part(drags) {
         background-color: var(--qti-light-bg-active);
       }
     }
     &.qti-selections-dark {
-      &:state(--dragzone-active)::part(drags) {
+      &:is(:state(--dragzone-active), [data-state~='--dragzone-active'])::part(drags) {
         background-color: var(--qti-dark-bg-active);
         border-color: var(--qti-dark-border-active);
       }
-      &:state(--dragzone-enabled)::part(drags) {
+      &:is(:state(--dragzone-enabled), [data-state~='--dragzone-enabled'])::part(drags) {
         background-color: var(--qti-dark-bg-active);
       }
     }
-    &:state(--dragzone-active)::part(drags) {
+    &:is(:state(--dragzone-active), [data-state~='--dragzone-active'])::part(drags) {
       @apply act;
     }
-    &:state(--dragzone-enabled)::part(drags) {
+    &:is(:state(--dragzone-enabled), [data-state~='--dragzone-enabled'])::part(drags) {
       @apply dropping;
     }
     /* Editor fake-drag projected into a filled <qti-gap>'s shadow. Same `drag`
@@ -46,10 +46,10 @@
       &:focus {
         @apply foc;
       }
-      &:state(candidate-correct) {
+      &:is(:state(candidate-correct), [data-state~='candidate-correct']) {
         background-color: var(--qti-correct);
       }
-      &:state(candidate-incorrect) {
+      &:is(:state(candidate-incorrect), [data-state~='candidate-incorrect']) {
         background-color: var(--qti-incorrect);
       }
     }

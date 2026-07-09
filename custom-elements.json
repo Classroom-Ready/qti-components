@@ -26868,6 +26868,18 @@
           "name": "QtiConditionExpression",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -26928,6 +26940,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -26967,6 +27002,14 @@
           "name": "QtiExpression",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected"
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -27005,6 +27048,25 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected"
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully."
             },
             {
               "kind": "field",
@@ -27051,7 +27113,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -28912,7 +28974,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               },
               "inheritedFrom": {
                 "name": "QtiFeedback",
@@ -29133,7 +29195,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               },
               "inheritedFrom": {
                 "name": "QtiFeedback",
@@ -29409,7 +29471,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               },
               "inheritedFrom": {
                 "name": "QtiFeedback",
@@ -31999,6 +32061,18 @@
           "name": "QtiAnyN",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -32071,6 +32145,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -32150,6 +32247,18 @@
           "members": [
             {
               "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "field",
               "name": "baseType",
               "type": {
                 "text": "BaseType"
@@ -32224,6 +32333,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -32285,6 +32417,206 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The condition container: walk branches in order, process the first whose\n`shouldProcess()` is true, then stop.",
+          "name": "QtiConditionBase",
+          "members": [
+            {
+              "kind": "method",
+              "name": "process",
+              "privacy": "public",
+              "inheritedFrom": {
+                "name": "QtiRule",
+                "module": "packages/qti-processing/src/components/qti-rule/qti-rule.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "QtiRule",
+            "module": "/packages/qti-processing/src/components/qti-rule/qti-rule"
+          }
+        },
+        {
+          "kind": "class",
+          "description": "A single branch of a condition (if / else-if / else). It owns the sub-rule\nprocessing; subclasses decide whether the branch applies (`shouldProcess`)\nand which of its children are sub-rules (`getSubRules`).",
+          "name": "QtiConditionBranchBase",
+          "members": [
+            {
+              "kind": "method",
+              "name": "getSubRules",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "QtiRule[]"
+                }
+              },
+              "description": "The sub-rules to process when this branch applies."
+            },
+            {
+              "kind": "method",
+              "name": "process",
+              "privacy": "public"
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed."
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "customElement": true,
+          "modulePath": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+        },
+        {
+          "kind": "class",
+          "description": "The `else` branch: no condition (always applies), every child is a sub-rule.",
+          "name": "QtiConditionElseBase",
+          "members": [
+            {
+              "kind": "method",
+              "name": "getSubRules",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "QtiRule[]"
+                }
+              },
+              "description": "The sub-rules to process when this branch applies.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "process",
+              "privacy": "public",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "QtiConditionBranchBase",
+            "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+          }
+        },
+        {
+          "kind": "class",
+          "description": "The `if` / `else-if` branch: first child is the boolean expression, the\nremaining children are the sub-rules processed when it evaluates to true.",
+          "name": "QtiConditionIfBase",
+          "members": [
+            {
+              "kind": "method",
+              "name": "getSubRules",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "QtiRule[]"
+                }
+              },
+              "description": "The sub-rules to process when this branch applies.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "process",
+              "privacy": "public",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "QtiConditionBranchBase",
+            "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+          }
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "QtiConditionBase",
+          "declaration": {
+            "name": "QtiConditionBase",
+            "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QtiConditionBranchBase",
+          "declaration": {
+            "name": "QtiConditionBranchBase",
+            "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QtiConditionElseBase",
+          "declaration": {
+            "name": "QtiConditionElseBase",
+            "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QtiConditionIfBase",
+          "declaration": {
+            "name": "QtiConditionIfBase",
+            "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/qti-processing/src/components/qti-container-size/qti-container-size.ts",
       "declarations": [
         {
@@ -32292,6 +32624,18 @@
           "description": "",
           "name": "QtiContainerSize",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -32356,6 +32700,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -32413,6 +32780,18 @@
           "description": "",
           "name": "QtiContains",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -32477,6 +32856,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -32527,6 +32929,18 @@
           "description": "",
           "name": "QtiCorrect",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -32596,6 +33010,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -32659,7 +33096,11 @@
               "type": {
                 "text": "TestContext | undefined"
               },
-              "privacy": "protected"
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
             },
             {
               "kind": "method",
@@ -32734,6 +33175,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -32801,6 +33265,18 @@
           "name": "QtiDelete",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -32864,6 +33340,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -32921,6 +33420,18 @@
           "description": "",
           "name": "QtiDivide",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#collectNumericValues",
@@ -33003,6 +33514,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -33060,6 +33594,18 @@
           "description": "",
           "name": "QtiDurationGte",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#getDurationValues",
@@ -33146,6 +33692,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -33209,6 +33778,18 @@
           "name": "QtiDurationLt",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "#getDurationValues",
               "privacy": "private",
@@ -33294,6 +33875,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -33358,6 +33962,18 @@
           "name": "QtiEqualRounded",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -33420,6 +34036,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -33502,6 +34141,18 @@
           "name": "QtiEqual",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -33559,6 +34210,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -33641,6 +34315,18 @@
           "name": "QtiFieldValue",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -33704,6 +34390,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -33761,6 +34470,18 @@
           "description": "",
           "name": "QtiGcd",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#calculateGcd",
@@ -33869,6 +34590,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -33926,6 +34670,18 @@
           "description": "",
           "name": "QtiGt",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -33990,6 +34746,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -34046,6 +34825,18 @@
           "description": "",
           "name": "QtiGte",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -34110,6 +34901,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -34160,6 +34974,18 @@
           "description": "",
           "name": "QtiIndex",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#lookupVariableValue",
@@ -34250,6 +35076,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -34315,6 +35164,18 @@
           "description": "",
           "name": "QtiInside",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#isInsideCircle",
@@ -34520,6 +35381,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -34603,6 +35487,18 @@
           "name": "QtiIntegerDivide",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "#collectIntegerValues",
               "privacy": "private",
@@ -34678,6 +35574,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -34742,6 +35661,18 @@
           "name": "QtiIntegerModulus",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "#collectIntegerValues",
               "privacy": "private",
@@ -34823,6 +35754,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -34880,6 +35834,18 @@
           "description": "",
           "name": "QtiIntegerToFloat",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -34944,6 +35910,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -35001,6 +35990,18 @@
           "description": "",
           "name": "QtiIsNull",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -35065,6 +36066,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -35122,6 +36146,18 @@
           "description": "",
           "name": "QtiLcm",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#collectIntegerValues",
@@ -35246,6 +36282,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -35410,6 +36469,18 @@
           "name": "QtiLt",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -35473,6 +36544,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -35529,6 +36623,18 @@
           "description": "",
           "name": "QtiLte",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -35593,6 +36699,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -35643,6 +36772,18 @@
           "description": "",
           "name": "QtiMapResponsePoint",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -35709,6 +36850,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -35780,6 +36944,18 @@
           "name": "QtiMapResponse",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -35845,6 +37021,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -35922,6 +37121,18 @@
           "description": "",
           "name": "QtiMatch",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -36009,6 +37220,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -36066,6 +37300,18 @@
           "description": "",
           "name": "QtiMathOperator",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#performOperation",
@@ -36163,6 +37409,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -36230,6 +37499,18 @@
           "name": "QtiMax",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "#collectNumericValues",
               "privacy": "private",
@@ -36305,6 +37586,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -36369,6 +37673,18 @@
           "name": "QtiMember",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -36432,6 +37748,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -36488,6 +37827,18 @@
           "description": "",
           "name": "QtiMin",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#collectNumericValues",
@@ -36570,6 +37921,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -36627,6 +38001,18 @@
           "description": "",
           "name": "QtiMultiple",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -36691,6 +38077,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -36747,6 +38156,18 @@
           "description": "",
           "name": "QtiNot",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -36805,6 +38226,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -36869,6 +38313,18 @@
           "name": "QtiNull",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -36926,6 +38382,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -36990,6 +38469,18 @@
           "name": "QtiOr",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -37053,6 +38544,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -37104,6 +38618,18 @@
           "description": "",
           "name": "QtiOrdered",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -37168,6 +38694,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -37217,6 +38766,324 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/qti-processing/src/components/qti-outcome-condition/qti-outcome-condition.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "QtiOutcomeCondition",
+          "superclass": {
+            "name": "QtiConditionBase",
+            "module": "/packages/qti-processing/src/components/qti-condition/qti-condition-base"
+          },
+          "tagName": "qti-outcome-condition",
+          "customElement": true,
+          "members": [
+            {
+              "kind": "method",
+              "name": "process",
+              "privacy": "public",
+              "inheritedFrom": {
+                "name": "QtiRule",
+                "module": "packages/qti-processing/src/components/qti-rule/qti-rule.ts"
+              },
+              "type": {
+                "text": "process() => void"
+              }
+            }
+          ],
+          "modulePath": "packages/qti-processing/src/components/qti-outcome-condition/qti-outcome-condition.ts",
+          "definitionPath": "packages/qti-processing/src/components/qti-outcome-condition/qti-outcome-condition.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "qti-outcome-condition",
+          "declaration": {
+            "name": "QtiOutcomeCondition",
+            "module": "packages/qti-processing/src/components/qti-outcome-condition/qti-outcome-condition.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QtiOutcomeCondition",
+          "declaration": {
+            "name": "QtiOutcomeCondition",
+            "module": "packages/qti-processing/src/components/qti-outcome-condition/qti-outcome-condition.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/qti-processing/src/components/qti-outcome-else-if/qti-outcome-else-if.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "QtiOutcomeElseIf",
+          "superclass": {
+            "name": "QtiOutcomeIf",
+            "module": "/packages/qti-processing/src/components/qti-outcome-if/qti-outcome-if"
+          },
+          "tagName": "qti-outcome-else-if",
+          "customElement": true,
+          "members": [
+            {
+              "kind": "method",
+              "name": "getSubRules",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "QtiRule[]"
+                }
+              },
+              "description": "The sub-rules to process when this branch applies.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "getSubRules() => QtiRule[]"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "process",
+              "privacy": "public",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "process() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "shouldProcess() => boolean"
+              }
+            }
+          ],
+          "modulePath": "packages/qti-processing/src/components/qti-outcome-else-if/qti-outcome-else-if.ts",
+          "definitionPath": "packages/qti-processing/src/components/qti-outcome-else-if/qti-outcome-else-if.ts",
+          "cssProperties": [],
+          "cssParts": [],
+          "cssStates": [],
+          "attributes": [],
+          "events": [],
+          "slots": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "qti-outcome-else-if",
+          "declaration": {
+            "name": "QtiOutcomeElseIf",
+            "module": "packages/qti-processing/src/components/qti-outcome-else-if/qti-outcome-else-if.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QtiOutcomeElseIf",
+          "declaration": {
+            "name": "QtiOutcomeElseIf",
+            "module": "packages/qti-processing/src/components/qti-outcome-else-if/qti-outcome-else-if.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/qti-processing/src/components/qti-outcome-else/qti-outcome-else.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "QtiOutcomeElse",
+          "superclass": {
+            "name": "QtiConditionElseBase",
+            "module": "/packages/qti-processing/src/components/qti-condition/qti-condition-base"
+          },
+          "tagName": "qti-outcome-else",
+          "customElement": true,
+          "members": [
+            {
+              "kind": "method",
+              "name": "getSubRules",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "QtiRule[]"
+                }
+              },
+              "description": "The sub-rules to process when this branch applies.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "getSubRules() => QtiRule[]"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "process",
+              "privacy": "public",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "process() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "shouldProcess() => boolean"
+              }
+            }
+          ],
+          "modulePath": "packages/qti-processing/src/components/qti-outcome-else/qti-outcome-else.ts",
+          "definitionPath": "packages/qti-processing/src/components/qti-outcome-else/qti-outcome-else.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "qti-outcome-else",
+          "declaration": {
+            "name": "QtiOutcomeElse",
+            "module": "packages/qti-processing/src/components/qti-outcome-else/qti-outcome-else.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QtiOutcomeElse",
+          "declaration": {
+            "name": "QtiOutcomeElse",
+            "module": "packages/qti-processing/src/components/qti-outcome-else/qti-outcome-else.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "packages/qti-processing/src/components/qti-outcome-if/qti-outcome-if.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "QtiOutcomeIf",
+          "superclass": {
+            "name": "QtiConditionIfBase",
+            "module": "/packages/qti-processing/src/components/qti-condition/qti-condition-base"
+          },
+          "tagName": "qti-outcome-if",
+          "customElement": true,
+          "members": [
+            {
+              "kind": "method",
+              "name": "getSubRules",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "QtiRule[]"
+                }
+              },
+              "description": "The sub-rules to process when this branch applies.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "getSubRules() => QtiRule[]"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "process",
+              "privacy": "public",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "process() => void"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "shouldProcess() => boolean"
+              }
+            }
+          ],
+          "modulePath": "packages/qti-processing/src/components/qti-outcome-if/qti-outcome-if.ts",
+          "definitionPath": "packages/qti-processing/src/components/qti-outcome-if/qti-outcome-if.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "qti-outcome-if",
+          "declaration": {
+            "name": "QtiOutcomeIf",
+            "module": "packages/qti-processing/src/components/qti-outcome-if/qti-outcome-if.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "QtiOutcomeIf",
+          "declaration": {
+            "name": "QtiOutcomeIf",
+            "module": "packages/qti-processing/src/components/qti-outcome-if/qti-outcome-if.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/qti-processing/src/components/qti-pattern-match/qti-pattern-match.ts",
       "declarations": [
         {
@@ -37224,6 +39091,18 @@
           "description": "",
           "name": "QtiPatternMatch",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -37297,6 +39176,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -37364,6 +39266,18 @@
           "name": "QtiPower",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -37421,6 +39335,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -37581,6 +39518,18 @@
           "name": "QtiProduct",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -37644,6 +39593,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -37701,6 +39673,18 @@
           "description": "",
           "name": "QtiRandomInteger",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "calculate",
@@ -37791,6 +39775,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -37889,6 +39896,18 @@
           "name": "QtiRandom",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -37952,6 +39971,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -38008,6 +40050,18 @@
           "description": "",
           "name": "QtiRepeat",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#resolveRepeatCount",
@@ -38109,6 +40163,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -38174,6 +40251,12 @@
           "kind": "class",
           "description": "",
           "name": "QtiResponseCondition",
+          "superclass": {
+            "name": "QtiConditionBase",
+            "module": "/packages/qti-processing/src/components/qti-condition/qti-condition-base"
+          },
+          "tagName": "qti-response-condition",
+          "customElement": true,
           "members": [
             {
               "kind": "method",
@@ -38188,20 +40271,8 @@
               }
             }
           ],
-          "superclass": {
-            "name": "QtiRule",
-            "module": "/packages/qti-processing/src/components/qti-rule/qti-rule"
-          },
-          "tagName": "qti-response-condition",
-          "customElement": true,
           "modulePath": "packages/qti-processing/src/components/qti-response-condition/qti-response-condition.ts",
-          "definitionPath": "packages/qti-processing/src/components/qti-response-condition/qti-response-condition.ts",
-          "cssProperties": [],
-          "cssParts": [],
-          "cssStates": [],
-          "attributes": [],
-          "events": [],
-          "slots": []
+          "definitionPath": "packages/qti-processing/src/components/qti-response-condition/qti-response-condition.ts"
         }
       ],
       "exports": [
@@ -38231,19 +40302,13 @@
           "kind": "class",
           "description": "",
           "name": "QtiResponseElseIf",
+          "superclass": {
+            "name": "QtiResponseIf",
+            "module": "/packages/qti-processing/src/components/qti-response-if/qti-response-if"
+          },
+          "tagName": "qti-response-else-if",
+          "customElement": true,
           "members": [
-            {
-              "kind": "method",
-              "name": "calculate",
-              "privacy": "public",
-              "inheritedFrom": {
-                "name": "QtiResponseElse",
-                "module": "packages/qti-processing/src/components/qti-response-else/qti-response-else.ts"
-              },
-              "type": {
-                "text": "calculate() => void"
-              }
-            },
             {
               "kind": "method",
               "name": "getSubRules",
@@ -38253,9 +40318,10 @@
                   "text": "QtiRule[]"
                 }
               },
+              "description": "The sub-rules to process when this branch applies.",
               "inheritedFrom": {
-                "name": "QtiResponseElse",
-                "module": "packages/qti-processing/src/components/qti-response-else/qti-response-else.ts"
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
               },
               "type": {
                 "text": "getSubRules() => QtiRule[]"
@@ -38266,20 +40332,32 @@
               "name": "process",
               "privacy": "public",
               "inheritedFrom": {
-                "name": "QtiResponseElse",
-                "module": "packages/qti-processing/src/components/qti-response-else/qti-response-else.ts"
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
               },
               "type": {
                 "text": "process() => void"
               }
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "shouldProcess() => boolean"
+              }
             }
           ],
-          "superclass": {
-            "name": "QtiResponseIf",
-            "module": "/packages/qti-processing/src/components/qti-response-if/qti-response-if"
-          },
-          "tagName": "qti-response-else-if",
-          "customElement": true,
           "modulePath": "packages/qti-processing/src/components/qti-response-else-if/qti-response-else-if.ts",
           "definitionPath": "packages/qti-processing/src/components/qti-response-else-if/qti-response-else-if.ts",
           "cssProperties": [],
@@ -38317,15 +40395,13 @@
           "kind": "class",
           "description": "",
           "name": "QtiResponseElse",
+          "superclass": {
+            "name": "QtiConditionElseBase",
+            "module": "/packages/qti-processing/src/components/qti-condition/qti-condition-base"
+          },
+          "tagName": "qti-response-else",
+          "customElement": true,
           "members": [
-            {
-              "kind": "method",
-              "name": "calculate",
-              "privacy": "public",
-              "type": {
-                "text": "calculate() => void"
-              }
-            },
             {
               "kind": "method",
               "name": "getSubRules",
@@ -38335,6 +40411,11 @@
                   "text": "QtiRule[]"
                 }
               },
+              "description": "The sub-rules to process when this branch applies.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
               "type": {
                 "text": "getSubRules() => QtiRule[]"
               }
@@ -38343,17 +40424,33 @@
               "kind": "method",
               "name": "process",
               "privacy": "public",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
               "type": {
                 "text": "process() => void"
               }
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "shouldProcess() => boolean"
+              }
             }
           ],
-          "superclass": {
-            "name": "LitElement",
-            "package": "lit"
-          },
-          "tagName": "qti-response-else",
-          "customElement": true,
           "modulePath": "packages/qti-processing/src/components/qti-response-else/qti-response-else.ts",
           "definitionPath": "packages/qti-processing/src/components/qti-response-else/qti-response-else.ts"
         }
@@ -38385,19 +40482,13 @@
           "kind": "class",
           "description": "",
           "name": "QtiResponseIf",
+          "superclass": {
+            "name": "QtiConditionIfBase",
+            "module": "/packages/qti-processing/src/components/qti-condition/qti-condition-base"
+          },
+          "tagName": "qti-response-if",
+          "customElement": true,
           "members": [
-            {
-              "kind": "method",
-              "name": "calculate",
-              "privacy": "public",
-              "inheritedFrom": {
-                "name": "QtiResponseElse",
-                "module": "packages/qti-processing/src/components/qti-response-else/qti-response-else.ts"
-              },
-              "type": {
-                "text": "calculate() => void"
-              }
-            },
             {
               "kind": "method",
               "name": "getSubRules",
@@ -38407,9 +40498,10 @@
                   "text": "QtiRule[]"
                 }
               },
+              "description": "The sub-rules to process when this branch applies.",
               "inheritedFrom": {
-                "name": "QtiResponseElse",
-                "module": "packages/qti-processing/src/components/qti-response-else/qti-response-else.ts"
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
               },
               "type": {
                 "text": "getSubRules() => QtiRule[]"
@@ -38420,28 +40512,34 @@
               "name": "process",
               "privacy": "public",
               "inheritedFrom": {
-                "name": "QtiResponseElse",
-                "module": "packages/qti-processing/src/components/qti-response-else/qti-response-else.ts"
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
               },
               "type": {
                 "text": "process() => void"
               }
+            },
+            {
+              "kind": "method",
+              "name": "shouldProcess",
+              "privacy": "public",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this branch's sub-rules should be processed.",
+              "inheritedFrom": {
+                "name": "QtiConditionBranchBase",
+                "module": "packages/qti-processing/src/components/qti-condition/qti-condition-base.ts"
+              },
+              "type": {
+                "text": "shouldProcess() => boolean"
+              }
             }
           ],
-          "superclass": {
-            "name": "QtiResponseElse",
-            "module": "/packages/qti-processing/src/components/qti-response-else/qti-response-else"
-          },
-          "tagName": "qti-response-if",
-          "customElement": true,
           "modulePath": "packages/qti-processing/src/components/qti-response-if/qti-response-if.ts",
-          "definitionPath": "packages/qti-processing/src/components/qti-response-if/qti-response-if.ts",
-          "cssProperties": [],
-          "cssParts": [],
-          "cssStates": [],
-          "attributes": [],
-          "events": [],
-          "slots": []
+          "definitionPath": "packages/qti-processing/src/components/qti-response-if/qti-response-if.ts"
         }
       ],
       "exports": [
@@ -38472,6 +40570,18 @@
           "description": "",
           "name": "QtiRoundTo",
           "members": [
+            {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
             {
               "kind": "method",
               "name": "#roundToDecimalPlaces",
@@ -38595,6 +40705,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -38679,6 +40812,18 @@
           "name": "QtiRound",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -38736,6 +40881,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -39260,6 +41428,18 @@
           "name": "QtiStatsOperator",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "#collectNumericValues",
               "privacy": "private",
@@ -39368,6 +41548,29 @@
               }
             },
             {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "field",
               "name": "result",
               "type": {
@@ -39435,6 +41638,18 @@
           "name": "QtiStringMatch",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -39501,6 +41716,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -39573,6 +41811,18 @@
           "name": "QtiSubstring",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -39639,6 +41889,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -39836,6 +42109,18 @@
           "name": "QtiSum",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -39893,6 +42178,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -39977,6 +42285,18 @@
           "name": "QtiTruncate",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -40034,6 +42354,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -40098,6 +42441,18 @@
           "name": "QtiVariable",
           "members": [
             {
+              "kind": "field",
+              "name": "_testContext",
+              "type": {
+                "text": "TestContext | undefined"
+              },
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
               "kind": "method",
               "name": "calculate",
               "privacy": "public",
@@ -40155,6 +42510,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -40339,6 +42717,14 @@
           "declaration": {
             "name": "*",
             "module": "packages/qti-test/src/components/test-show-correct-response/test-show-correct-response"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "packages/qti-test/src/components/test-show-feedback/test-show-feedback"
           }
         },
         {
@@ -41119,13 +43505,23 @@
           "members": [
             {
               "kind": "field",
+              "name": "_available",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "For `access=\"atEnd\"`: whether the feedback's outcome has matched and it is\nready to be shown. While available, the feedback stays hidden until a\ntest-show-feedback button navigates the candidate to it. `during` feedback\nignores this flag and shows the instant its outcome matches."
+            },
+            {
+              "kind": "field",
               "name": "_computedContext",
               "type": {
                 "text": "ComputedContext | undefined"
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               },
               "inheritedFrom": {
                 "name": "QtiFeedback",
@@ -41162,6 +43558,17 @@
             },
             {
               "kind": "method",
+              "name": "#outcomeMatches",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Whether this feedback's outcome variable currently includes its identifier."
+            },
+            {
+              "kind": "method",
               "name": "#sessionControlAllowsFeedback",
               "privacy": "private",
               "return": {
@@ -41173,6 +43580,31 @@
                 "name": "QtiFeedback",
                 "module": "packages/qti-base/src/abstract/qti-feedback.ts"
               }
+            },
+            {
+              "kind": "method",
+              "name": "#setAvailable",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "available",
+                  "type": {
+                    "text": "boolean"
+                  }
+                },
+                {
+                  "name": "partId",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ],
+              "description": "Update availability and announce the change so test-show-feedback can enable."
             },
             {
               "kind": "method",
@@ -41312,6 +43744,24 @@
               }
             }
           ],
+          "events": [
+            {
+              "name": "qti-register-feedback",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "inheritedFrom": {
+                "name": "QtiFeedback",
+                "module": "packages/qti-base/src/abstract/qti-feedback.ts"
+              }
+            },
+            {
+              "name": "qti-test-feedback-availability-changed",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
           "attributes": [
             {
               "name": "access",
@@ -41366,18 +43816,6 @@
           },
           "tagName": "qti-test-feedback",
           "customElement": true,
-          "events": [
-            {
-              "name": "qti-register-feedback",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "inheritedFrom": {
-                "name": "QtiFeedback",
-                "module": "packages/qti-base/src/abstract/qti-feedback.ts"
-              }
-            }
-          ],
           "modulePath": "packages/qti-test/src/components/qti-test-feedback/qti-test-feedback.ts",
           "definitionPath": "packages/qti-test/src/components/qti-test-feedback/qti-test-feedback.ts",
           "cssProperties": [],
@@ -41561,7 +43999,11 @@
               "type": {
                 "text": "TestContext | undefined"
               },
-              "privacy": "public"
+              "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
             },
             {
               "kind": "method",
@@ -41631,6 +44073,29 @@
                 "text": "QtiContext | undefined"
               },
               "privacy": "protected",
+              "inheritedFrom": {
+                "name": "QtiExpression",
+                "module": "packages/qti-base/src/abstract/qti-expression.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolveVariable",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "VariableDeclaration<string | string[] | null> | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a declared variable from the closest available scope: item-level\nfirst, then the test-level outcome variables. Mirrors qti-printed-variable,\nso expressions used in an assessmentTest's outcome processing can reference\ntest-level outcomes (e.g. a SCORE summed via qti-test-variables) — which the\nQTI variable expression is specified to do. Returns null when unresolved\nrather than throwing, so callers degrade gracefully.",
               "inheritedFrom": {
                 "name": "QtiExpression",
                 "module": "packages/qti-base/src/abstract/qti-expression.ts"
@@ -42081,7 +44546,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             }
           ],
@@ -42247,11 +44712,11 @@
             },
             {
               "kind": "method",
-              "name": "#assessCorrectness",
+              "name": "#assessOptimality",
               "privacy": "private",
               "return": {
                 "type": {
-                  "text": "'unknown' | 'correct' | 'incorrect'"
+                  "text": "ItemOptimality"
                 }
               },
               "parameters": [
@@ -42262,7 +44727,24 @@
                   }
                 }
               ],
-              "description": "Compare current response values to their declared qti-correct-response.\nBookkeeping variables like numAttempts can be typed 'response' but never\ndeclare a correctResponse, so filter on declared correctResponse.\nReturns 'unknown' for items without any judgeable response (essays, etc.)."
+              "description": "Decide whether an item's submission is as good as it can get — i.e. the\ncandidate reached the *optimal* outcome, so there's no reason to make them\ntry again. 'optimal' means best achievable, 'suboptimal' means a better\nattempt is still possible, 'unscored' means there's nothing to judge against.\n(\"optimal\" is the spec's own word — a qti-correct-response is defined as\n\"the (or an) optimal value\".)\n\nTwo signals, in order of authority:\n 1. The scored outcome: optimal ⟺ SCORE has reached its maximum (MAXSCORE).\n    This correctly handles partial-credit / qti-mapping items, where an exact\n    response match would under- or over-judge.\n 2. The declared qti-correct-response, for items that aren't scored (no\n    SCORE/MAXSCORE) — an exact match is the best available proxy. Bookkeeping\n    variables like numAttempts can be typed 'response' but never declare a\n    correctResponse, so we filter on a declared correctResponse.\n\nItems with neither a comparable score nor a correctResponse (essays, etc.)\nare 'unscored' — there's no optimal value to require, so one attempt is enough."
+            },
+            {
+              "kind": "field",
+              "name": "#availableFeedbacks",
+              "privacy": "private",
+              "default": "new Map<string, string | null>()",
+              "description": "atEnd feedbacks that have announced themselves available, keyed by identifier → partId."
+            },
+            {
+              "kind": "method",
+              "name": "#availableFeedbacksList",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "AvailableFeedback[]"
+                }
+              }
             },
             {
               "kind": "field",
@@ -42292,6 +44774,25 @@
             },
             {
               "kind": "method",
+              "name": "#handleFeedbackAvailabilityChanged",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "QtiTestFeedbackAvailabilityChangedEvent"
+                  }
+                }
+              ],
+              "description": "Record (or clear) an atEnd feedback's availability and rebuild the computed\ncontext so test-show-feedback can react. Owned here because test-navigation\nalready provides computedContext to the navigation buttons."
+            },
+            {
+              "kind": "method",
               "name": "#handleInteractionChanged",
               "privacy": "private",
               "parameters": [
@@ -42315,6 +44816,20 @@
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "#handleItemContextUpdated",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "CustomEvent<{ itemContext: ItemContext; responseProcessed?: boolean }>"
+                  }
+                }
+              ],
+              "description": "Latch whether an item reached its optimal outcome whenever it has just ended\nan attempt. processResponse — fired by test-end-attempt, autoscore, or an\nin-item end-attempt interaction — flags its context update with\n`responseProcessed`; a plain selection updates the context without it, so\n`done` can't flip until the candidate actually ends the attempt."
             },
             {
               "kind": "method",
@@ -42410,9 +44925,9 @@
                   }
                 },
                 {
-                  "name": "itemContext",
+                  "name": "optimality",
                   "type": {
-                    "text": "ItemContext | undefined"
+                    "text": "ItemOptimality"
                   }
                 },
                 {
@@ -42422,7 +44937,39 @@
                   }
                 }
               ],
-              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, we treat the submission as their final answer unless we\n  can prove the answer is wrong AND there are attempts left. We can only\n  prove \"wrong\" when the item declares a qti-correct-response."
+              "description": "Decide whether an item should be treated as \"the candidate is done with it\"\nfor the purpose of firing end-of-part / end-of-test outcome processing.\n\n- Info items don't require submission.\n- Otherwise the candidate must have actually ended an attempt (numAttempts > 0).\n- Once attempted, the item is done if they reached the optimal outcome\n  ('optimal'), or there's nothing to improve on ('unscored'). It is only *not*\n  done while a better attempt is still possible ('suboptimal') and attempts\n  remain — see #assessOptimality for how \"optimal\" is determined.\n\n`optimality` reflects the last *ended attempt* (see #optimality), not the\nlive selection — so a freshly-picked optimal answer doesn't count as done\nuntil test-end-attempt evaluates it."
+            },
+            {
+              "kind": "method",
+              "name": "#numericVariable",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "variables",
+                  "type": {
+                    "text": "ItemContext['variables']"
+                  }
+                },
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Read a single numeric outcome value, or null when absent / non-numeric."
+            },
+            {
+              "kind": "field",
+              "name": "#optimality",
+              "privacy": "private",
+              "default": "new Map<string, ItemOptimality>()",
+              "description": "Whether each item's last *ended attempt* reached the optimal outcome, keyed\nby item-ref id. Written from #handleItemContextUpdated when processResponse\nends an attempt — never on a plain selection. Mirrors how inline feedback\nonly re-evaluates when an attempt is processed, so a freshly-picked answer\ndoesn't flip `done` until the candidate ends the attempt."
             },
             {
               "kind": "field",
@@ -42459,7 +45006,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -42656,7 +45203,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -42762,7 +45309,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -42877,7 +45424,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -42959,7 +45506,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             }
           ],
@@ -43009,7 +45556,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             }
           ],
@@ -43072,7 +45619,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -43174,7 +45721,7 @@
               },
               "privacy": "protected",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -43266,7 +45813,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
@@ -43427,7 +45974,7 @@
               },
               "privacy": "public",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] } | undefined"
               }
             },
             {
@@ -43560,6 +46107,166 @@
     },
     {
       "kind": "javascript-module",
+      "path": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Navigates the candidate to an `access=\"atEnd\"` qti-test-feedback once it has\nbecome available (its end-of-part / end-of-test outcome has matched). The\nbutton is disabled until then, so a host can keep it hidden until enabled.\n\nClicking dispatches a `feedback` navigation request, which clears the current\nassessment item and shows the feedback. Navigating to any item afterwards (or\nmoving into a later test-part) hides the feedback again.",
+          "name": "TestShowFeedback",
+          "members": [
+            {
+              "kind": "method",
+              "name": "_handleComputedContextChange",
+              "parameters": [
+                {
+                  "name": "_oldValue",
+                  "type": {
+                    "text": "ComputedContext"
+                  }
+                },
+                {
+                  "name": "newValue",
+                  "type": {
+                    "text": "ComputedContext"
+                  }
+                }
+              ],
+              "type": {
+                "text": "_handleComputedContextChange(_oldValue: ComputedContext, newValue: ComputedContext) => void"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "_internalDisabled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "public",
+              "default": "true",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "method",
+              "name": "_requestFeedback",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "#feedbackId",
+              "privacy": "private",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Identifier of the feedback to navigate to, set whenever one is available."
+            },
+            {
+              "kind": "field",
+              "name": "#internals",
+              "privacy": "private",
+              "type": {
+                "text": "ElementInternals"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "ariaLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Show feedback'"
+            },
+            {
+              "kind": "field",
+              "name": "computedContext",
+              "type": {
+                "text": "ComputedContext"
+              },
+              "privacy": "private",
+              "parsedType": {
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "role",
+              "type": {
+                "text": "string"
+              },
+              "default": "'button'"
+            },
+            {
+              "kind": "field",
+              "name": "sessionContext",
+              "type": {
+                "text": "SessionContext"
+              },
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "name": "qti-request-navigation",
+              "type": {
+                "text": "CustomEvent"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "fieldName": "_internalDisabled"
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "test-show-feedback",
+          "customElement": true,
+          "modulePath": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts",
+          "definitionPath": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "test-show-feedback",
+          "declaration": {
+            "name": "TestShowFeedback",
+            "module": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "TestShowFeedback",
+          "declaration": {
+            "name": "TestShowFeedback",
+            "module": "packages/qti-test/src/components/test-show-feedback/test-show-feedback.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "packages/qti-test/src/components/test-stamp/test-stamp.ts",
       "declarations": [
         {
@@ -43575,7 +46282,7 @@
               },
               "privacy": "private",
               "parsedType": {
-                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
+                "text": "{ view: '' | 'author' | 'candidate' | 'proctor' | 'scorer' | 'testConstructor' | 'tutor', identifier: string, title: string, availableFeedbacks: AvailableFeedback[], testParts: { active?: boolean; identifier: string; navigationMode: 'linear' | 'nonlinear'; submissionMode: 'individual' | 'simultaneous'; allowSkipping?: boolean; sections: { active?: boolean; identifier: string; ... 5 more ...; allowSkipping?: boolean; }[]; }[] }"
               }
             },
             {
