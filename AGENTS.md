@@ -14,6 +14,26 @@
 - QTI interaction package: `packages/qti-interactions/`
 - Theme package: `packages/qti-theme/`
 
+## Classroom-Ready Fork Conventions
+
+This is `Classroom-Ready/qti-components`, a fork of `Citolab/qti-components` consumed by the
+`classroomready` monorepo as a submodule. `CONTRIBUTING.md` describes the upstream repo's own
+trunk-based workflow (`main`, auto-merge, npm releases) and does not apply here as-is:
+
+- Branch off `classroomready` (this fork's integration branch), not `main` — `main` here tracks
+  upstream via a periodic rebase (`sync-upstream.yml`), so it does not reflect what the fork
+  actually ships.
+- Open PRs targeting `classroomready`. Never push directly to `classroomready`.
+- Never use `gh pr merge --auto` — `classroomready` does not have the `main`-only
+  branch-protection ruleset `CONTRIBUTING.md` describes (that ruleset is scoped to
+  `Citolab/qti-components`'s own `main`), so `--auto` would merge immediately instead of
+  waiting for CI to go green.
+- Releases to the frontend happen via a manually-cut `vX.Y.Z-cr` GitHub Release from
+  `classroomready`, not the changesets/npm-publish flow in `CONTRIBUTING.md`.
+
+`CONTRIBUTING.md`'s canonical commands, pre-commit hooks, and coding defaults still apply —
+only branch/merge/release mechanics differ.
+
 ## Canonical Commands
 
 - Install dependencies: `pnpm install`
