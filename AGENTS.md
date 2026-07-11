@@ -2,7 +2,7 @@
 
 ## Scope And Precedence
 
-- This file defines repository-wide defaults for contributors and coding agents.
+- Repository-wide defaults for contributors and coding agents.
 - A package-level `AGENTS.md` may add stricter rules for that package.
 - Package-level rules must not weaken core safety, quality, and verification requirements in this root file.
 
@@ -16,13 +16,13 @@
 
 ## Classroom-Ready Fork Conventions
 
-This is `Classroom-Ready/qti-components`, a fork of `Citolab/qti-components` consumed by the
-`classroomready` monorepo as a submodule. `CONTRIBUTING.md` describes the upstream repo's own
-trunk-based workflow (`main`, auto-merge, npm releases) and does not apply here as-is:
+`Classroom-Ready/qti-components` is a fork of `Citolab/qti-components` consumed by the
+`classroomready` monorepo as a submodule. `CONTRIBUTING.md` describes the upstream repo's
+trunk-based workflow (`main`, auto-merge, npm releases), which does not apply here as-is:
 
 - Branch off `classroomready` (this fork's integration branch), not `main` — `main` here tracks
   upstream via a periodic rebase (`sync-upstream.yml`), so it does not reflect what the fork
-  actually ships.
+  ships.
 - Open PRs targeting `classroomready`. Never push directly to `classroomready`.
 - Never use `gh pr merge --auto` — `classroomready` does not have the `main`-only
   branch-protection ruleset `CONTRIBUTING.md` describes (that ruleset is scoped to
