@@ -298,10 +298,16 @@ export abstract class Interaction extends LitElement implements IInteraction {
     }
   }
 
-  public toggleCandidateCorrection(show: boolean): void {
-    this._internals.states.delete('candidate-correct');
-    this._internals.states.delete('candidate-partially-correct');
-    this._internals.states.delete('candidate-incorrect');
+  public toggleCandidateCorrection(show: boolean, accumulate = false): void {
+    // In accumulate mode a previously-shown mark is kept (so a learner's wrong
+    // pick from an earlier attempt stays flagged across subsequent attempts);
+    // otherwise recompute from the current response each call. Hiding always
+    // clears, regardless of mode.
+    if (!accumulate || !show) {
+      this._internals.states.delete('candidate-correct');
+      this._internals.states.delete('candidate-partially-correct');
+      this._internals.states.delete('candidate-incorrect');
+    }
 
     if (!show) {
       return;

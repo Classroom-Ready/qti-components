@@ -281,6 +281,15 @@ export class QtiAssessmentItem extends LitElement {
   };
 
   /**
+   * When true, a change to a response variable no longer auto-hides candidate
+   * correction (see `updateResponseVariable`). Off by default so the library
+   * clears stale correction on every selection as before; the opt-in
+   * reveal-correction flow on <test-navigation> sets it so marks persist and
+   * accumulate across attempts until the next attempt is scored.
+   */
+  public persistCandidateCorrection = false;
+
+  /**
    * Toggles the display of correct responses for all interactions.
    * @param show - A boolean indicating whether to show or hide correct responses.
    */
@@ -300,10 +309,10 @@ export class QtiAssessmentItem extends LitElement {
    * Toggles the display of the candidate correction for all interactions.
    * @param show - A boolean indicating whether to show or hide candidate correction.
    */
-  public showCandidateCorrection(show: boolean): void {
+  public showCandidateCorrection(show: boolean, accumulate = false): void {
     // Iterate through all interaction elements
     for (const interaction of this.#interactionElements) {
-      interaction.toggleCandidateCorrection(show);
+      interaction.toggleCandidateCorrection(show, accumulate);
     }
 
     // Update one or more toggle component states // ItemShowCandidateCorrection
@@ -400,8 +409,12 @@ export class QtiAssessmentItem extends LitElement {
       variables: this._context.variables.map(v => (v.identifier !== identifier ? v : { ...v, value: value }))
     };
 
-    // Turn off candidate correction after change of response variable
-    this.showCandidateCorrection(false);
+    // Turn off candidate correction after change of response variable — unless
+    // the consumer opted into persistence (reveal-correction), where earlier
+    // wrong picks stay marked until the next attempt is scored.
+    if (!this.persistCandidateCorrection) {
+      this.showCandidateCorrection(false);
+    }
 
     this.dispatchEvent(
       new CustomEvent<InteractionChangedDetails>('qti-interaction-changed', {

@@ -78,6 +78,14 @@ export class TestNavigation extends LitElement {
 
   @property({ type: Boolean, attribute: 'auto-score-items' }) autoScoreItems = false;
 
+  /**
+   * When set, reflect scoring back to the candidate after every ended attempt:
+   * mark their incorrect selection(s) red (candidate correction), and once an
+   * item's attempts are exhausted while still incorrect, also reveal the correct
+   * answer (green).
+   */
+  @property({ type: Boolean, attribute: 'reveal-correction' }) revealCorrection = false;
+
   #testElement: QtiAssessmentTest;
 
   /** Test-parts whose end-of-part transition has already been announced. */
@@ -169,6 +177,56 @@ export class TestNavigation extends LitElement {
     if (itemContext?.identifier) {
       this.#optimality.set(itemContext.identifier, this.#assessOptimality(itemContext));
     }
+    if (this.revealCorrection) {
+      this.#revealItemCorrection(event, itemContext);
+    }
+  }
+
+  /**
+   * Drive the correct/incorrect highlight from scoring after an ended attempt
+   * (only when `reveal-correction` is set). Reuses the same assessment-item API
+   * as the manual `test-show-candidate-correction` / `test-show-correct-response`
+   * handlers, but decides automatically from score and attempt count:
+   * - candidate correction (a mark on the learner's selection) after every
+   *   scored attempt. It accumulates and persists: each wrong attempt adds a ✘
+   *   to that pick and earlier marks stay put through later selections and
+   *   attempts (so two wrong attempts leave two ✘), and a correct pick is
+   *   highlighted too;
+   * - correct response (green ✔ on the right answer) once the learner gets it
+   *   right, or once the item is out of attempts and still incorrect.
+   */
+  #revealItemCorrection(event: CustomEvent, itemContext: ItemContext): void {
+    const assessmentItem = (event.composedPath()[0] as HTMLElement)?.closest<QtiAssessmentItem>('qti-assessment-item');
+    if (!assessmentItem) return;
+
+    const score = Number(itemContext.variables?.find(v => v.identifier === 'SCORE')?.value);
+    if (Number.isNaN(score)) return; // unscored attempt — nothing to reveal
+    const isCorrect = score > 0;
+
+    const numAttempts = Number(itemContext.variables?.find(v => v.identifier === 'numAttempts')?.value) || 0;
+    const maxAttempts = this.#maxAttemptsFor(itemContext.identifier);
+    const attemptsExhausted = maxAttempts > 0 && numAttempts >= maxAttempts;
+
+    // Opt the item out of the default "clear candidate correction on any
+    // response change" so marks stay while the learner picks again, and pass
+    // accumulate so each scored attempt adds to (rather than replaces) the
+    // marks from earlier attempts.
+    assessmentItem.persistCandidateCorrection = true;
+    // Mark the candidate's picks — a ✘ on each wrong choice (accumulating) and
+    // the correct-pick highlight when they choose correctly.
+    assessmentItem.showCandidateCorrection(true, /* accumulate */ true);
+    // Reveal the correct answer (green ✔) once they get it right, or once they
+    // run out of attempts while still incorrect.
+    assessmentItem.showCorrectResponse(isCorrect || attemptsExhausted);
+  }
+
+  /** Effective max-attempts for an item, from the computed session-control cascade. */
+  #maxAttemptsFor(identifier: string): number {
+    const item = this.computedContext?.testParts
+      ?.flatMap(part => part.sections)
+      .flatMap(section => section.items)
+      .find(i => i.identifier === identifier);
+    return item?.maxAttempts ?? 1;
   }
 
   /**
