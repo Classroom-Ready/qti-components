@@ -6,13 +6,16 @@ import type { TestNavigation } from './test-navigation';
 import type { ComputedContext } from '@qti-components/base';
 
 /**
- * Behaviour of the opt-in `reveal-correction` flag on <test-navigation>: after
- * each ended attempt it marks the candidate's wrong selection (candidate
- * correction), and once the item's attempts are exhausted while still incorrect
- * it also reveals the correct answer. Driven entirely by the SCORE / numAttempts
- * on the processed item context plus the item's max-attempts.
+ * Behaviour of the QTI-standard `qti-item-session-control show-solution` opt-in
+ * on <test-navigation>: after each ended attempt it marks the candidate's
+ * selection (candidate correction), and once the item is *done* — the candidate
+ * reached the optimal outcome or ran out of attempts — it also reveals the
+ * correct answer. Correctness/doneness reuse the navigation's own
+ * #assessOptimality / #isItemDone, so items with no SCORE but a declared
+ * qti-correct-response are judged too. Nothing happens for items that didn't
+ * opt in, mirroring the library's default clear-on-change behaviour.
  */
-describe('TestNavigation reveal-correction', () => {
+describe('TestNavigation show-solution', () => {
   let container: HTMLDivElement;
 
   beforeEach(() => {
@@ -24,9 +27,10 @@ describe('TestNavigation reveal-correction', () => {
     container.remove();
   });
 
-  // A computed context whose single item carries the given max-attempts — this
-  // is what #maxAttemptsFor reads to decide when attempts are exhausted.
-  const contextWithMaxAttempts = (maxAttempts: number): ComputedContext =>
+  // A computed context whose single item carries the given show-solution opt-in
+  // and max-attempts — what #revealItemCorrection reads to decide whether to act
+  // and when the item is out of attempts.
+  const contextWith = (showSolution: boolean, maxAttempts: number): ComputedContext =>
     ({
       view: 'candidate',
       identifier: 'test',
@@ -44,7 +48,7 @@ describe('TestNavigation reveal-correction', () => {
               title: 'Section 1',
               navigationMode: 'nonlinear',
               submissionMode: 'individual',
-              items: [{ identifier: 'item1', active: true, categories: [], maxAttempts }]
+              items: [{ identifier: 'item1', active: true, categories: [], maxAttempts, showSolution }]
             }
           ]
         }
@@ -54,11 +58,10 @@ describe('TestNavigation reveal-correction', () => {
   // Mount a <test-navigation> with a stubbed assessment item inside it, so a
   // bubbling qti-item-context-updated event resolves back to the item via
   // composedPath()…closest('qti-assessment-item').
-  const mount = async (revealCorrection: boolean, maxAttempts: number) => {
+  const mount = async (showSolution: boolean, maxAttempts: number) => {
     const nav = document.createElement('test-navigation') as TestNavigation;
     // The only non-optional context read in willUpdate; empty items is enough.
     (nav as unknown as { _testContext: unknown })._testContext = { items: [] };
-    nav.revealCorrection = revealCorrection;
     container.appendChild(nav);
 
     const item = document.createElement('qti-assessment-item');
@@ -68,19 +71,23 @@ describe('TestNavigation reveal-correction', () => {
     nav.appendChild(item);
 
     // Set after appending so the (optional) connected-item rebuild can't clobber it.
-    (nav as unknown as { computedContext: ComputedContext }).computedContext = contextWithMaxAttempts(maxAttempts);
+    (nav as unknown as { computedContext: ComputedContext }).computedContext = contextWith(showSolution, maxAttempts);
     await nav.updateComplete;
 
     return { item, showCandidateCorrection, showCorrectResponse };
   };
 
+  // End an attempt by dispatching a processed context update carrying the given
+  // variables. `responseProcessed` marks it as the end of an attempt (vs a plain
+  // selection). A scored attempt sets SCORE/MAXSCORE; an unscored-but-declared
+  // one sets a RESPONSE variable with a correctResponse.
   const endAttempt = (
     item: HTMLElement,
     {
-      score,
+      variables,
       numAttempts,
       responseProcessed = true
-    }: { score: number; numAttempts: number; responseProcessed?: boolean }
+    }: { variables: Array<Record<string, unknown>>; numAttempts: number; responseProcessed?: boolean }
   ) => {
     item.dispatchEvent(
       new CustomEvent('qti-item-context-updated', {
@@ -90,32 +97,35 @@ describe('TestNavigation reveal-correction', () => {
           responseProcessed,
           itemContext: {
             identifier: 'item1',
-            variables: [
-              { identifier: 'SCORE', value: `${score}` },
-              { identifier: 'numAttempts', value: `${numAttempts}` }
-            ]
+            variables: [...variables, { identifier: 'numAttempts', value: `${numAttempts}` }]
           }
         }
       })
     );
   };
 
-  it('marks the wrong answer (accumulating) but does not reveal the correct one before attempts are exhausted', async () => {
+  const scored = (score: number, maxScore = 1) => [
+    { identifier: 'SCORE', value: `${score}` },
+    { identifier: 'MAXSCORE', value: `${maxScore}` }
+  ];
+
+  it('marks the wrong answer (accumulating) but does not reveal the correct one before the item is done', async () => {
     const { item, showCandidateCorrection, showCorrectResponse } = await mount(true, 2);
 
-    endAttempt(item, { score: 0, numAttempts: 1 });
+    endAttempt(item, { variables: scored(0), numAttempts: 1 });
 
     // accumulate=true so an earlier wrong pick stays marked across attempts…
     expect(showCandidateCorrection).toHaveBeenCalledWith(true, true);
     // …and the item is opted out of the on-change auto-clear so it persists.
     expect((item as unknown as { persistCandidateCorrection: boolean }).persistCandidateCorrection).toBe(true);
+    // suboptimal with an attempt remaining → not done → correct answer stays hidden.
     expect(showCorrectResponse).toHaveBeenCalledWith(false);
   });
 
   it('reveals the correct answer once attempts are exhausted and still incorrect', async () => {
     const { item, showCandidateCorrection, showCorrectResponse } = await mount(true, 2);
 
-    endAttempt(item, { score: 0, numAttempts: 2 });
+    endAttempt(item, { variables: scored(0), numAttempts: 2 });
 
     expect(showCandidateCorrection).toHaveBeenCalledWith(true, true);
     expect(showCorrectResponse).toHaveBeenCalledWith(true);
@@ -124,18 +134,31 @@ describe('TestNavigation reveal-correction', () => {
   it('marks the correct pick and reveals the correct answer on a correct attempt', async () => {
     const { item, showCandidateCorrection, showCorrectResponse } = await mount(true, 2);
 
-    endAttempt(item, { score: 1, numAttempts: 1 });
+    endAttempt(item, { variables: scored(1), numAttempts: 1 });
 
     // Still marks the candidate's pick (accumulate keeps earlier ✘)…
     expect(showCandidateCorrection).toHaveBeenCalledWith(true, true);
-    // …and reveals the correct answer (✔) as soon as they get it right.
+    // …and reveals the correct answer (✔) as soon as SCORE reaches MAXSCORE.
     expect(showCorrectResponse).toHaveBeenCalledWith(true);
   });
 
-  it('does nothing when reveal-correction is not set', async () => {
+  it('judges correctness from a declared correct-response when the item has no SCORE', async () => {
+    const { item, showCorrectResponse } = await mount(true, 2);
+
+    // No SCORE/MAXSCORE, but a response variable whose value matches its declared
+    // correctResponse — #assessOptimality treats this as optimal → done → reveal.
+    endAttempt(item, {
+      variables: [{ identifier: 'RESPONSE', type: 'response', value: 'ChoiceA', correctResponse: 'ChoiceA' }],
+      numAttempts: 1
+    });
+
+    expect(showCorrectResponse).toHaveBeenCalledWith(true);
+  });
+
+  it('does nothing when the assessment did not opt in via show-solution', async () => {
     const { item, showCandidateCorrection, showCorrectResponse } = await mount(false, 2);
 
-    endAttempt(item, { score: 0, numAttempts: 2 });
+    endAttempt(item, { variables: scored(0), numAttempts: 2 });
 
     expect(showCandidateCorrection).not.toHaveBeenCalled();
     expect(showCorrectResponse).not.toHaveBeenCalled();
@@ -144,7 +167,7 @@ describe('TestNavigation reveal-correction', () => {
   it('ignores plain selections that are not a processed attempt', async () => {
     const { item, showCandidateCorrection, showCorrectResponse } = await mount(true, 2);
 
-    endAttempt(item, { score: 0, numAttempts: 1, responseProcessed: false });
+    endAttempt(item, { variables: scored(0), numAttempts: 1, responseProcessed: false });
 
     expect(showCandidateCorrection).not.toHaveBeenCalled();
     expect(showCorrectResponse).not.toHaveBeenCalled();
