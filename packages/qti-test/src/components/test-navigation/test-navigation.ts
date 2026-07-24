@@ -197,13 +197,11 @@ export class TestNavigation extends LitElement {
     const numAttempts = Number(itemContext.variables?.find(v => v.identifier === 'numAttempts')?.value) || 0;
     const done = this.#isItemDone(numAttempts, optimality, computedItem.maxAttempts);
 
-    // Opt the item out of the default "clear candidate correction on any
-    // response change" so marks stay while the learner picks again, and pass
-    // accumulate so each attempt adds to (rather than replaces) the marks from
-    // earlier attempts.
-    assessmentItem.persistCandidateCorrection = true;
-    // Mark the candidate's picks — a ✘ on each wrong choice (accumulating) and
-    // the correct-pick highlight when they choose correctly.
+    // Mark the candidate's picks — a ✘ on each wrong choice and the correct-pick
+    // highlight when they choose correctly. Passing accumulate makes each attempt
+    // add to (rather than replace) the marks from earlier attempts, and opts the
+    // item out of the default "clear candidate correction on any response change"
+    // so the marks stay put while the learner picks again.
     assessmentItem.showCandidateCorrection(true, /* accumulate */ true);
     // Reveal the correct answer (green ✔) once the item is done — reached its
     // optimal outcome, or ran out of attempts while still suboptimal.

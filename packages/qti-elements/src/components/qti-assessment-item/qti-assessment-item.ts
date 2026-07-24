@@ -283,11 +283,13 @@ export class QtiAssessmentItem extends LitElement {
   /**
    * When true, a change to a response variable no longer auto-hides candidate
    * correction (see `updateResponseVariable`). Off by default so the library
-   * clears stale correction on every selection as before; the opt-in
-   * reveal-correction flow on <test-navigation> sets it so marks persist and
-   * accumulate across attempts until the next attempt is scored.
+   * clears stale correction on every selection as before. Not set directly:
+   * it's derived by `showCandidateCorrection` — showing correction in
+   * accumulate mode (the reveal-correction flow) turns it on so marks persist
+   * across selections, and hiding (or a plain, non-accumulating show) turns it
+   * back off.
    */
-  public persistCandidateCorrection = false;
+  #persistCandidateCorrection = false;
 
   /**
    * Toggles the display of correct responses for all interactions.
@@ -308,8 +310,14 @@ export class QtiAssessmentItem extends LitElement {
   /**
    * Toggles the display of the candidate correction for all interactions.
    * @param show - A boolean indicating whether to show or hide candidate correction.
+   * @param accumulate - When showing, add to the existing marks (and keep them
+   *   across later selections) rather than recomputing from the current
+   *   response. This is what the reveal-correction flow needs, so it also drives
+   *   `#persistCandidateCorrection`.
    */
   public showCandidateCorrection(show: boolean, accumulate = false): void {
+    this.#persistCandidateCorrection = show && accumulate;
+
     // Iterate through all interaction elements
     for (const interaction of this.#interactionElements) {
       interaction.toggleCandidateCorrection(show, accumulate);
@@ -412,7 +420,7 @@ export class QtiAssessmentItem extends LitElement {
     // Turn off candidate correction after change of response variable — unless
     // the consumer opted into persistence (reveal-correction), where earlier
     // wrong picks stay marked until the next attempt is scored.
-    if (!this.persistCandidateCorrection) {
+    if (!this.#persistCandidateCorrection) {
       this.showCandidateCorrection(false);
     }
 

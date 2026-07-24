@@ -114,10 +114,11 @@ describe('TestNavigation show-solution', () => {
 
     endAttempt(item, { variables: scored(0), numAttempts: 1 });
 
-    // accumulate=true so an earlier wrong pick stays marked across attempts…
+    // accumulate=true so an earlier wrong pick stays marked across attempts — it
+    // also opts the item out of the on-change auto-clear (showCandidateCorrection
+    // derives that from accumulate), so the marks persist while the learner picks
+    // again. See the assessment-item unit spec for the persistence behaviour itself.
     expect(showCandidateCorrection).toHaveBeenCalledWith(true, true);
-    // …and the item is opted out of the on-change auto-clear so it persists.
-    expect((item as unknown as { persistCandidateCorrection: boolean }).persistCandidateCorrection).toBe(true);
     // suboptimal with an attempt remaining → not done → correct answer stays hidden.
     expect(showCorrectResponse).toHaveBeenCalledWith(false);
   });

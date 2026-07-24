@@ -40,6 +40,20 @@ export const Default: Story = {
 const CHOICE_B = 'Do not let someone else look after your luggage.';
 const CHOICE_C = 'Remember your luggage when you leave.';
 
+// The player only sets the :state() custom states; the visible feedback is drawn
+// by the qti-theme these stories load. These helpers read that rendered result
+// (rather than the internal state flags) so the stories validate what a
+// candidate actually sees:
+//  - a wrong pick gets the theme's "incorrect" fill (background-color);
+//  - the revealed correct answer gets a ✔ from the theme's ::after.
+const fillOf = (choice: QtiSimpleChoice): string => getComputedStyle(choice).backgroundColor;
+
+// The reveal glyph the theme prints on the correct answer — '' when none.
+const revealMarkOf = (choice: QtiSimpleChoice): string =>
+  getComputedStyle(choice, '::after').content.replace(/["']/g, '').replace(/^none$/, '');
+
+const CHECK = '✔'; // ✔ — the theme's correct-response mark (content: '\02714')
+
 /**
  * Opting an item into the QTI-standard `qti-item-session-control show-solution`
  * makes the player reflect correctness back to the candidate after each ended
@@ -74,22 +88,26 @@ export const ShowSolutionPersists: Story = {
       await waitFor(() => expect(choice(id).internals.states.has('--checked')).toBe(true));
     };
 
-    // First wrong attempt: the pick is marked incorrect, correct answer stays hidden.
+    // First wrong attempt: the pick takes on the theme's "incorrect" fill (a
+    // visible change from its plain picked look), and the correct answer is not
+    // revealed yet (attempts remain).
     await pick(CHOICE_B, 'ChoiceB');
+    const pickedFill = fillOf(choice('ChoiceB'));
     endAttemptBtn.click();
-    await waitFor(() => expect(choice('ChoiceB').internals.states.has('candidate-incorrect')).toBe(true));
-    expect(choice('ChoiceA').internals.states.has('correct-response')).toBe(false);
+    await waitFor(() => expect(fillOf(choice('ChoiceB'))).not.toBe(pickedFill));
+    const incorrectFill = fillOf(choice('ChoiceB'));
+    expect(revealMarkOf(choice('ChoiceA'))).toBe('');
 
-    // Re-selecting another answer keeps the earlier ✘ (persisted, not cleared).
+    // Re-selecting another answer keeps the earlier mark (persisted, not cleared).
     await pick(CHOICE_C, 'ChoiceC');
-    expect(choice('ChoiceB').internals.states.has('candidate-incorrect')).toBe(true);
+    expect(fillOf(choice('ChoiceB'))).toBe(incorrectFill);
 
-    // Second wrong attempt exhausts max-attempts: both wrong picks stay marked
-    // (accumulated → two ✘) and the correct answer is now revealed.
+    // Second wrong attempt exhausts max-attempts: both wrong picks carry the same
+    // incorrect fill (accumulated) and the correct answer is now revealed with a ✔.
     endAttemptBtn.click();
-    await waitFor(() => expect(choice('ChoiceA').internals.states.has('correct-response')).toBe(true));
-    expect(choice('ChoiceB').internals.states.has('candidate-incorrect')).toBe(true);
-    expect(choice('ChoiceC').internals.states.has('candidate-incorrect')).toBe(true);
+    await waitFor(() => expect(revealMarkOf(choice('ChoiceA'))).toBe(CHECK));
+    expect(fillOf(choice('ChoiceB'))).toBe(incorrectFill);
+    expect(fillOf(choice('ChoiceC'))).toBe(incorrectFill);
   }
 };
 
@@ -122,11 +140,14 @@ export const WithoutShowSolution: Story = {
 
     within(interaction).getByText<QtiSimpleChoice>(CHOICE_B).click();
     await waitFor(() => expect(choice('ChoiceB').internals.states.has('--checked')).toBe(true));
+    const pickedFill = fillOf(choice('ChoiceB'));
 
     endAttemptBtn.click();
-    // Let the ended attempt propagate, then confirm the player left correction alone.
+    // Let the ended attempt propagate, then confirm the candidate sees no feedback —
+    // without the show-solution opt-in the pick keeps its plain look and the
+    // correct answer is never revealed.
     await new Promise(resolve => setTimeout(resolve, 100));
-    expect(choice('ChoiceB').internals.states.has('candidate-incorrect')).toBe(false);
-    expect(choice('ChoiceA').internals.states.has('correct-response')).toBe(false);
+    expect(fillOf(choice('ChoiceB'))).toBe(pickedFill);
+    expect(revealMarkOf(choice('ChoiceA'))).toBe('');
   }
 };

@@ -151,6 +151,66 @@ describe('qti-assessment-item', () => {
     expect(+assessmentItem.getOutcome('SCORE').value).toBe(2);
   });
 
+  // A choice item whose correct answer is ChoiceA — enough for candidate
+  // correction to mark a wrong pick (ChoiceB) and to reveal correctness.
+  const renderChoiceItem = async (identifier: string) => {
+    render(
+      html`<qti-assessment-item identifier="${identifier}">
+        <qti-response-declaration identifier="RESPONSE" cardinality="single" base-type="identifier">
+          <qti-correct-response>
+            <qti-value>ChoiceA</qti-value>
+          </qti-correct-response>
+        </qti-response-declaration>
+        <qti-outcome-declaration identifier="SCORE" cardinality="single" base-type="integer"></qti-outcome-declaration>
+        <qti-item-body>
+          <qti-choice-interaction response-identifier="RESPONSE" max-choices="1">
+            <qti-simple-choice identifier="ChoiceA">Choice A</qti-simple-choice>
+            <qti-simple-choice identifier="ChoiceB">Choice B</qti-simple-choice>
+          </qti-choice-interaction>
+        </qti-item-body>
+      </qti-assessment-item>`,
+      container
+    );
+
+    const assessmentItem = container.querySelector('qti-assessment-item') as QtiAssessmentItem;
+    await assessmentItem.updateComplete;
+    const interaction = assessmentItem.querySelector('qti-choice-interaction') as HTMLElement & {
+      response: string | string[];
+    };
+    const choiceB = assessmentItem.querySelector(
+      'qti-simple-choice[identifier="ChoiceB"]'
+    ) as HTMLElement & { internals: ElementInternals };
+    return { assessmentItem, interaction, choiceB };
+  };
+
+  it('keeps candidate correction across a response change once shown with accumulate', async () => {
+    const { assessmentItem, interaction, choiceB } = await renderChoiceItem('candidate-correction-persist');
+
+    // The learner picked the wrong choice and the attempt was marked with
+    // accumulate=true (the reveal-correction flow).
+    interaction.response = 'ChoiceB';
+    assessmentItem.showCandidateCorrection(true, /* accumulate */ true);
+    expect(choiceB.internals.states.has('candidate-incorrect')).toBe(true);
+
+    // Re-selecting another answer must NOT wipe the earlier mark — showing with
+    // accumulate opted the item out of the on-change auto-clear.
+    assessmentItem.updateResponseVariable('RESPONSE', 'ChoiceA');
+    expect(choiceB.internals.states.has('candidate-incorrect')).toBe(true);
+  });
+
+  it('clears candidate correction on a response change when shown without accumulate', async () => {
+    const { assessmentItem, interaction, choiceB } = await renderChoiceItem('candidate-correction-default');
+
+    // Plain (non-accumulating) show — the library's default behaviour.
+    interaction.response = 'ChoiceB';
+    assessmentItem.showCandidateCorrection(true);
+    expect(choiceB.internals.states.has('candidate-incorrect')).toBe(true);
+
+    // A response change clears the stale mark, as it always has.
+    assessmentItem.updateResponseVariable('RESPONSE', 'ChoiceA');
+    expect(choiceB.internals.states.has('candidate-incorrect')).toBe(false);
+  });
+
   it('waits for template declarations before automatic template processing', async () => {
     render(
       html`<qti-assessment-item identifier="template-ordering">
