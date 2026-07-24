@@ -166,9 +166,54 @@ export class TestNavigation extends LitElement {
   #handleItemContextUpdated(event: CustomEvent<{ itemContext: ItemContext; responseProcessed?: boolean }>) {
     if (!event.detail?.responseProcessed) return;
     const itemContext = event.detail.itemContext;
-    if (itemContext?.identifier) {
-      this.#optimality.set(itemContext.identifier, this.#assessOptimality(itemContext));
-    }
+    if (!itemContext?.identifier) return;
+    const optimality = this.#assessOptimality(itemContext);
+    this.#optimality.set(itemContext.identifier, optimality);
+    this.#revealItemCorrection(event, itemContext, optimality);
+  }
+
+  /**
+   * Reflect correctness back to the candidate after an ended attempt, but only
+   * for items the assessment opted in via the standard
+   * `qti-item-session-control show-solution` (QTI 3.0 ItemSessionControl.show-solution) —
+   * the player takes no opinion of its own. Reuses the same assessment-item API
+   * as the manual `test-show-candidate-correction` / `test-show-correct-response`
+   * handlers, and reuses the navigation's own doneness/optimality assessment
+   * (`#isItemDone` / `#assessOptimality`) rather than re-deriving correctness:
+   * - candidate correction (a mark on the learner's selection) after every
+   *   attempt. It accumulates and persists: each wrong attempt adds a ✘ to that
+   *   pick and earlier marks stay put through later selections and attempts (so
+   *   two wrong attempts leave two ✘), and a correct pick is highlighted too;
+   * - the correct response (green ✔ on the right answer) once the item is done —
+   *   the candidate reached the optimal outcome, or ran out of attempts.
+   */
+  #revealItemCorrection(event: CustomEvent, itemContext: ItemContext, optimality: ItemOptimality): void {
+    const computedItem = this.#computedItemFor(itemContext.identifier);
+    if (!computedItem?.showSolution) return;
+
+    const assessmentItem = (event.composedPath()[0] as HTMLElement)?.closest<QtiAssessmentItem>('qti-assessment-item');
+    if (!assessmentItem) return;
+
+    const numAttempts = Number(itemContext.variables?.find(v => v.identifier === 'numAttempts')?.value) || 0;
+    const done = this.#isItemDone(numAttempts, optimality, computedItem.maxAttempts);
+
+    // Mark the candidate's picks — a ✘ on each wrong choice and the correct-pick
+    // highlight when they choose correctly. Passing accumulate makes each attempt
+    // add to (rather than replace) the marks from earlier attempts, and opts the
+    // item out of the default "clear candidate correction on any response change"
+    // so the marks stay put while the learner picks again.
+    assessmentItem.showCandidateCorrection(true, /* accumulate */ true);
+    // Reveal the correct answer (green ✔) once the item is done — reached its
+    // optimal outcome, or ran out of attempts while still suboptimal.
+    assessmentItem.showCorrectResponse(done);
+  }
+
+  /** The computed-context entry for an item, from the session-control cascade. */
+  #computedItemFor(identifier: string): ComputedItem | undefined {
+    return this.computedContext?.testParts
+      ?.flatMap(part => part.sections)
+      .flatMap(section => section.items)
+      .find(i => i.identifier === identifier);
   }
 
   /**
@@ -278,6 +323,7 @@ export class TestNavigation extends LitElement {
         const partAllowSkipping = testPartSessionControl ? testPartSessionControl.allowSkipping : true;
         const partMaxAttempts = testPartSessionControl ? testPartSessionControl.maxAttempts : 1;
         const partShowFeedback = testPartSessionControl ? testPartSessionControl.showFeedback : false;
+        const partShowSolution = testPartSessionControl ? testPartSessionControl.showSolution : false;
         return {
           active: false,
           identifier: testPart.identifier,
@@ -294,6 +340,7 @@ export class TestNavigation extends LitElement {
               : partAllowSkipping;
             const sectionMaxAttempts = sectionSessionControl ? sectionSessionControl.maxAttempts : partMaxAttempts;
             const sectionShowFeedback = sectionSessionControl ? sectionSessionControl.showFeedback : partShowFeedback;
+            const sectionShowSolution = sectionSessionControl ? sectionSessionControl.showSolution : partShowSolution;
             return {
               active: false,
               identifier: section.identifier,
@@ -308,6 +355,7 @@ export class TestNavigation extends LitElement {
                 const itemAllowSkipping = itemSessionControl ? itemSessionControl.allowSkipping : sectionAllowSkipping;
                 const itemMaxAttempts = itemSessionControl ? itemSessionControl.maxAttempts : sectionMaxAttempts;
                 const itemShowFeedback = itemSessionControl ? itemSessionControl.showFeedback : sectionShowFeedback;
+                const itemShowSolution = itemSessionControl ? itemSessionControl.showSolution : sectionShowSolution;
                 return {
                   ...this.initContext?.find(i => i.identifier === item.identifier),
                   active: false,
@@ -317,7 +365,8 @@ export class TestNavigation extends LitElement {
                   variables: [] as OutcomeVariable[],
                   allowSkipping: itemAllowSkipping,
                   maxAttempts: itemMaxAttempts,
-                  showFeedback: itemShowFeedback
+                  showFeedback: itemShowFeedback,
+                  showSolution: itemShowSolution
                 };
               })
             };

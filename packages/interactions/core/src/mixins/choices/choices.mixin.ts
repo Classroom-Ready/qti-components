@@ -101,7 +101,7 @@ export const ChoicesMixin = <T extends Constructor<Interaction>>(superClass: T, 
       }
     }
 
-    public override toggleCandidateCorrection(show: boolean) {
+    public override toggleCandidateCorrection(show: boolean, accumulate = false) {
       // Get correct response from either responseVariable (item context) or local property (standalone)
       const correctResponse = this.correctResponse;
 
@@ -120,8 +120,13 @@ export const ChoicesMixin = <T extends Constructor<Interaction>>(superClass: T, 
           : [];
 
       this._choiceElements.forEach(choice => {
-        choice.internals.states.delete('candidate-correct');
-        choice.internals.states.delete('candidate-incorrect');
+        // In accumulate mode, keep marks from earlier attempts so a learner's
+        // previous wrong picks stay flagged; otherwise recompute from the
+        // current response. Hiding always clears, regardless of mode.
+        if (!accumulate || !show) {
+          choice.internals.states.delete('candidate-correct');
+          choice.internals.states.delete('candidate-incorrect');
+        }
         if (!show) {
           return;
         }
@@ -136,7 +141,7 @@ export const ChoicesMixin = <T extends Constructor<Interaction>>(superClass: T, 
       });
 
       // Also update interaction-level states
-      super.toggleCandidateCorrection(show);
+      super.toggleCandidateCorrection(show, accumulate);
     }
 
     override connectedCallback() {

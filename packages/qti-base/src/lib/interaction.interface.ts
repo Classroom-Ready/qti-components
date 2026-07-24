@@ -17,5 +17,5 @@ export interface IInteraction {
   reset(): void;
   saveResponse(value: string | string[]): void;
   toggleCorrectResponse(show: boolean): void;
-  toggleCandidateCorrection(show: boolean): void;
+  toggleCandidateCorrection(show: boolean, accumulate?: boolean): void;
 }
