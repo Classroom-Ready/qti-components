@@ -142,16 +142,36 @@ export class TestNavigation extends LitElement {
   }
 
   /**
+   * The rendered assessment item for an item-ref, or undefined while there is
+   * nothing to act on: the test element only exists from
+   * qti-assessment-test-connected onwards, and its item only from
+   * qti-assessment-item-connected. The candidate-facing navigation buttons are
+   * clickable before either happens — a test document that fails to load leaves
+   * them enabled indefinitely — so every handler resolves the item through here
+   * and no-ops when it is absent.
+   */
+  #assessmentItemFor(identifier: string | undefined): QtiAssessmentItem | undefined {
+    if (!identifier) return undefined;
+    const itemRef = this.#testElement?.querySelector<QtiAssessmentItemRef>(
+      `qti-assessment-item-ref[identifier="${identifier}"]`
+    );
+    return itemRef?.assessmentItem ?? undefined;
+  }
+
+  /** The assessment item the candidate is currently navigated to, if rendered. */
+  #activeAssessmentItem(): QtiAssessmentItem | undefined {
+    return this.#assessmentItemFor(this._sessionContext?.navItemRefId);
+  }
+
+  /**
    * Handles the 'test-end-attempt' event.
    * @private
    * @listens TestNavigation#test-end-attempt
    * @param {CustomEvent} event - The custom event object.
    */
   #handleTestEndAttempt(_event: CustomEvent) {
-    const qtiItemEl = this.#testElement.querySelector<QtiAssessmentItemRef>(
-      `qti-assessment-item-ref[identifier="${this._sessionContext.navItemRefId}"]`
-    );
-    const qtiAssessmentItemEl = qtiItemEl.assessmentItem;
+    const qtiAssessmentItemEl = this.#activeAssessmentItem();
+    if (!qtiAssessmentItemEl) return;
     const reportValidityAfterScoring = this.configContext?.reportValidityAfterScoring === true ? true : false;
     qtiAssessmentItemEl.processResponse(true, reportValidityAfterScoring);
   }
@@ -223,10 +243,7 @@ export class TestNavigation extends LitElement {
    * @param {CustomEvent} event - The custom event object.
    */
   #handleTestShowCorrectResponse(event: CustomEvent) {
-    const qtiItemEl = this.#testElement.querySelector<QtiAssessmentItemRef>(
-      `qti-assessment-item-ref[identifier="${this._sessionContext.navItemRefId}"]`
-    );
-    const qtiAssessmentItemEl = qtiItemEl.assessmentItem;
+    const qtiAssessmentItemEl = this.#activeAssessmentItem();
     if (!qtiAssessmentItemEl) return;
     qtiAssessmentItemEl.showCorrectResponse(event.detail);
   }
@@ -238,18 +255,14 @@ export class TestNavigation extends LitElement {
    * @param {CustomEvent} event - The custom event object.
    */
   #handleTestShowCandidateCorrection(event: CustomEvent) {
-    const qtiItemEl = this.#testElement.querySelector<QtiAssessmentItemRef>(
-      `qti-assessment-item-ref[identifier="${this._sessionContext.navItemRefId}"]`
-    );
-    const qtiAssessmentItemEl = qtiItemEl.assessmentItem;
+    const qtiAssessmentItemEl = this.#activeAssessmentItem();
+    if (!qtiAssessmentItemEl) return;
     qtiAssessmentItemEl.showCandidateCorrection(event.detail);
   }
 
   #handleTestUpdateOutcomeVariable(event: CustomEvent) {
-    const qtiItemEl = this.#testElement.querySelector<QtiAssessmentItemRef>(
-      `qti-assessment-item-ref[identifier="${event.detail.assessmentItemRefId}"]`
-    );
-    const qtiAssessmentItemEl = qtiItemEl.assessmentItem;
+    const qtiAssessmentItemEl = this.#assessmentItemFor(event.detail?.assessmentItemRefId);
+    if (!qtiAssessmentItemEl) return;
     qtiAssessmentItemEl.setOutcomeVariable(event.detail.outcomeVariableId, event.detail.value);
   }
 
@@ -523,10 +536,7 @@ export class TestNavigation extends LitElement {
 
                 const active = this._sessionContext?.navItemRefId === computedItem.identifier || false;
 
-                const qtiItemEl = this.#testElement?.querySelector<QtiAssessmentItemRef>(
-                  `qti-assessment-item-ref[identifier="${computedItem.identifier}"]`
-                );
-                const valid = qtiItemEl?.assessmentItem?.validate(false) ?? true;
+                const valid = this.#assessmentItemFor(computedItem.identifier)?.validate(false) ?? true;
 
                 const responseVars = itemContext?.variables?.filter(v => v.type === 'response') || [];
 

@@ -45148,6 +45148,17 @@
             },
             {
               "kind": "method",
+              "name": "#activeAssessmentItem",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "QtiAssessmentItem | undefined"
+                }
+              },
+              "description": "The assessment item the candidate is currently navigated to, if rendered."
+            },
+            {
+              "kind": "method",
               "name": "#announceCompletionTransitions",
               "privacy": "private",
               "return": {
@@ -45156,6 +45167,25 @@
                 }
               },
               "description": "After computedContext has been rebuilt, fire one-shot transition events\nthe first time each test-part — and the test as a whole — becomes done.\nDownstream listeners (test-processing.mixin) run outcomeProcessing in\nresponse so atEnd feedback can evaluate."
+            },
+            {
+              "kind": "method",
+              "name": "#assessmentItemFor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "QtiAssessmentItem | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "identifier",
+                  "type": {
+                    "text": "string | undefined"
+                  }
+                }
+              ],
+              "description": "The rendered assessment item for an item-ref, or undefined while there is\nnothing to act on: the test element only exists from\nqti-assessment-test-connected onwards, and its item only from\nqti-assessment-item-connected. The candidate-facing navigation buttons are\nclickable before either happens — a test document that fails to load leaves\nthem enabled indefinitely — so every handler resolves the item through here\nand no-ops when it is absent."
             },
             {
               "kind": "method",
