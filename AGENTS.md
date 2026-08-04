@@ -24,10 +24,11 @@ trunk-based workflow (`main`, auto-merge, npm releases) and does not apply here 
   upstream via a periodic rebase (`sync-upstream.yml`), so it does not reflect what the fork
   actually ships.
 - Open PRs targeting `classroomready`. Never push directly to `classroomready`.
-- Never use `gh pr merge --auto` — `classroomready` does not have the `main`-only
-  branch-protection ruleset `CONTRIBUTING.md` describes (that ruleset is scoped to
-  `Citolab/qti-components`'s own `main`), so `--auto` would merge immediately instead of
-  waiting for CI to go green.
+- `gh pr merge --auto` on a `classroomready` PR holds until the required `ci` check passes:
+  the branch carries classic protection requiring it. Reviews are not required, so `--auto`
+  merges on green with no human read — use it only where that is intended, as
+  `sync-upstream.yml` does. The `main`-only ruleset `CONTRIBUTING.md` describes is a separate
+  thing, scoped to `Citolab/qti-components`'s own `main`.
 - Releases to the frontend happen via a manually-cut `vX.Y.Z-cr` GitHub Release from
   `classroomready`, not the changesets/npm-publish flow in `CONTRIBUTING.md`.
 
@@ -46,25 +47,36 @@ only branch/merge/release mechanics differ.
 
 ## Resolving Upstream-Sync PR Conflicts
 
-Sync PRs (`main` -> `classroomready`) usually conflict only in generated custom-elements
-manifests: `custom-elements.json` (root) and `packages/qti-components/custom-elements.json`.
-Regenerate these from the merged source instead of hand-editing the conflict markers.
+`sync-upstream.yml` does the merge itself. It merges `origin/main` into the bot branch
+`automation/sync-upstream` (cut fresh from `classroomready` each run), rebuilds, commits, and
+opens the PR from that branch. The rebuild is the resolution: `pnpm build` and `pnpm cem`
+overwrite the committed custom-elements manifests from the merged sources, so the generated
+collisions that used to block every sync never reach the PR.
 
-Resolve on a fresh branch off `classroomready`, not on `main` (which is rebased by
-`sync-upstream.yml` and would clobber the fix). GitHub cannot repoint an existing PR's head
-branch, so open a new PR from this branch and close the auto-generated sync PR as superseded.
+The PR head is the bot branch, never `main` — `main` is an upstream mirror the same workflow
+rewrites daily, so a resolution committed there is clobbered on the next run. The workflow also
+dispatches `ci.yml` against that branch: GitHub raises no `pull_request` run for a PR opened
+with `GITHUB_TOKEN`, so without the dispatch the required `ci` check would never report and
+auto-merge would wait forever.
+
+When the job fails with "Conflicts the rebuild could not resolve", the conflict is in
+hand-written content and needs a human. Resolve it on a branch off `classroomready`, mirroring
+what the workflow does:
 
 - Branch off the integration branch: `git checkout -b sync-upstream-<date> origin/classroomready`.
 - Start the merge, leaving conflicts in place: `git merge --no-ff --no-commit origin/main`.
+- Resolve the hand-written conflicts by hand. Leave the `custom-elements*.json` manifests alone.
 - Reinstall against the merged manifest: `CI=true pnpm install --frozen-lockfile`. A failure
   here means the merged `package.json` and `pnpm-lock.yaml` disagree — fix that first.
-- Regenerate `packages/qti-components/custom-elements.json`: `pnpm build`.
-- Regenerate the root `custom-elements.json` (and the interactions manifest): `pnpm cem`.
-- Confirm no markers survive: `grep -c '<<<<<<<' custom-elements.json packages/qti-components/custom-elements.json`.
+- Rebuild the manifests: `pnpm build`, then `pnpm cem`.
+- Confirm no markers survive: `git grep -l '^<<<<<<< ' -- 'custom-elements*.json' '**/custom-elements*.json'`.
 - `public/mockServiceWorker.js` is an msw install artifact, not merge content — restore it:
   `git checkout -- public/mockServiceWorker.js`.
-- Stage the regenerated manifests, then commit: `git add custom-elements.json packages/qti-components/custom-elements.json`.
+- Stage the rebuilt manifests, then commit: `git add 'custom-elements*.json' '**/custom-elements*.json'`.
 - Verify the merged tree with `pnpm tsc` and `pnpm lint` before pushing.
+
+GitHub cannot repoint an open PR's head branch, so open a new PR from your branch and close the
+bot's as superseded.
 
 ## Coding And Testing Defaults
 
