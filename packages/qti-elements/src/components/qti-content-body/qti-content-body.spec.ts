@@ -34,7 +34,7 @@ describe('qti-content-body', () => {
       container
     );
 
-    const templateDeclaration = container.querySelector('qti-template-declaration') as HTMLElement & {
+    const templateDeclaration = container.querySelector('qti-template-declaration') as unknown as HTMLElement & {
       updateComplete: Promise<boolean>;
     };
     await templateDeclaration.updateComplete;
