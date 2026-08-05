@@ -116,6 +116,18 @@ jobs:
           node-version: 24.15.0
           cache: 'pnpm'
 
+      # The commit below fires `.husky/pre-commit`, whose lint-staged run ends in
+      # `vitest related` — browser-mode tests that launch Chromium. Without the
+      # browser the commit fails, so restore it from the same cache ci.yml uses.
+      - name: Cache Playwright browsers
+        if: steps.pending.outputs.changes == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
       - name: Rebuild the generated files and commit the merge
         if: steps.pending.outputs.changes == 'true'
         run: |
@@ -177,6 +189,12 @@ jobs:
             echo "::error::The merge left no conflicts, but the rebuild failed; see the log above."
             exit 1
           fi
+
+          # Needs the install above, so it cannot be its own step: the browser
+          # binaries are what `.husky/pre-commit` launches. Only Chromium — the
+          # vitest browser project has no other target.
+          echo "Installing the Chromium build the pre-commit hook needs..."
+          pnpm exec playwright install --with-deps chromium
 
           git commit --no-edit
           # Only this workflow ever writes the branch, and GitHub deletes it on
