@@ -1,31 +1,32 @@
-# Keeps this fork's `main` in sync with upstream `Citolab/qti-components`, then
-# proposes carrying those upstream changes into the long-lived `classroomready`
-# customization branch.
-#
-#   1. sync-main    — merge `upstream/main` into `origin/main` and push.
-#   2. propose-sync — merge `main` into a bot-owned branch off `classroomready`,
-#                     rebuild the committed custom-elements manifests from the
-#                     merged sources, commit that, and open (or update) the PR.
+# Carries upstream `Citolab/qti-components` changes into the long-lived
+# `classroomready` customization branch: merge `upstream/main` into a bot-owned
+# branch cut from `classroomready`, rebuild the committed build output from the
+# merged sources, commit that, and open (or update) the PR.
 #
 # `custom-elements.json` and its per-package siblings are build output that is
-# committed. Upstream and `classroomready` both regenerate them, so every sync
-# collides there even when no hand-written source conflicts. The rebuild is the
-# only automatic resolution: it overwrites those manifests from the merged
-# sources, which settles them without merging text. Anything the rebuild does
-# not settle is a conflict in hand-written content — the job fails and a human
-# resolves it.
+# committed, as is the msw worker `pnpm install` writes. Upstream and
+# `classroomready` both regenerate them, so every sync collides there even when
+# no hand-written source conflicts. The rebuild is the only automatic
+# resolution: it overwrites those files from the merged sources, which settles
+# them without merging text. Anything the rebuild does not settle is a conflict
+# in hand-written content — the job fails and a human resolves it.
 #
 # The `custom-elements*.json` glob picks the manifests up wherever they land;
 # upstream renames and relocates them as packages move.
 #
-# The PR head is a bot branch rather than `main` itself: `main` is a pure
-# upstream mirror that step 1 rewrites daily, so a resolution committed there
-# would be clobbered on the next run. Because the branch and the PR are created
-# with GITHUB_TOKEN, GitHub raises no `pull_request` run for them, so step 2
+# This merges `upstream/main` directly rather than routing through this fork's
+# `main` mirror. The org ruleset on `main` requires a pull request and grants
+# bypass only to organization admins, so a bot push to `main` is always
+# rejected — the mirror cannot be a step in this path. `main` is no longer
+# updated here at all; refresh it with GitHub's "Sync fork" button if you want
+# it current. Upstream's commits still become ancestors of `classroomready`,
+# because the bot branch merges `upstream/main` itself.
+#
+# The PR head is the bot branch. Because the branch and the PR are created with
+# GITHUB_TOKEN, GitHub raises no `pull_request` run for them, so the job
 # dispatches `ci.yml` itself to satisfy the check `classroomready` requires.
 #
-# Runs daily and on demand. A merge conflict in step 1 fails the run so a human
-# resolves it; propose-sync only runs once main is updated cleanly.
+# Runs daily and on demand.
 
 name: Sync fork with upstream
 
@@ -37,6 +38,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # `gh workflow run` (the ci.yml dispatch below) needs this.
+  actions: write
 
 # Never let two syncs race on the same branches.
 concurrency:
@@ -49,30 +52,7 @@ env:
   SYNC_BRANCH: automation/sync-upstream
 
 jobs:
-  sync-main:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout main
-        uses: actions/checkout@v7
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Configure git identity
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Merge upstream/main into main
-        run: |
-          git remote add upstream "$UPSTREAM_REPO"
-          git fetch upstream main
-          echo "Merging upstream/main into main..."
-          git merge --no-edit upstream/main
-          git push origin main
-
   propose-sync:
-    needs: sync-main
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -84,9 +64,14 @@ jobs:
       - name: Decide whether there is anything to carry over
         id: pending
         run: |
-          # main fully contained in the target branch => nothing to carry over.
-          if git merge-base --is-ancestor origin/main "origin/$TARGET_BRANCH"; then
-            echo "main is already contained in $TARGET_BRANCH; nothing to propose."
+          set -euo pipefail
+
+          git remote add upstream "$UPSTREAM_REPO"
+          git fetch upstream main
+
+          # upstream fully contained in the target branch => nothing to carry.
+          if git merge-base --is-ancestor upstream/main "origin/$TARGET_BRANCH"; then
+            echo "upstream/main is already contained in $TARGET_BRANCH; nothing to propose."
             echo "changes=false" >> "$GITHUB_OUTPUT"
           else
             echo "changes=true" >> "$GITHUB_OUTPUT"
@@ -98,7 +83,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Merge main into the sync branch
+      - name: Merge upstream into the sync branch
         if: steps.pending.outputs.changes == 'true'
         run: |
           set -euo pipefail
@@ -110,7 +95,7 @@ jobs:
           # is here to settle. MERGE_HEAD tells the two apart from a merge that
           # never started at all (unrelated histories, a refused merge), which
           # must still fail the job.
-          git merge --no-ff --no-commit origin/main ||
+          git merge --no-ff --no-commit upstream/main ||
             test -f "$(git rev-parse --git-path MERGE_HEAD)"
 
           echo "Conflicted paths after the merge:"
@@ -211,8 +196,8 @@ jobs:
             pr=$(gh pr create \
               --base "$TARGET_BRANCH" \
               --head "$SYNC_BRANCH" \
-              --title "Sync: merge upstream changes from main into $TARGET_BRANCH" \
-              --body "Automated by the **Sync fork with upstream** workflow. Carries the latest \`main\` (synced from upstream \`Citolab/qti-components\`) into \`$TARGET_BRANCH\`. Conflicts in the generated custom-elements manifests were resolved by rebuilding them from the merged sources. Review the upstream changes before merging.")
+              --title "Sync: merge upstream changes into $TARGET_BRANCH" \
+              --body "Automated by the **Sync fork with upstream** workflow. Carries the latest upstream \`Citolab/qti-components\` \`main\` into \`$TARGET_BRANCH\`. Collisions in the committed build output were settled by rebuilding it from the merged sources. Review the upstream changes before merging.")
           fi
 
           # GitHub suppresses workflow runs for events raised with GITHUB_TOKEN,
@@ -224,8 +209,8 @@ jobs:
           gh workflow run ci.yml --ref "$SYNC_BRANCH" -f branch="$SYNC_BRANCH"
 
           # Pin the merge to a merge commit. A squash/rebase would rewrite these
-          # commits and break main's ancestry in $TARGET_BRANCH, making every
-          # later sync re-surface them as conflicts. --auto holds until the
+          # commits and break upstream's ancestry in $TARGET_BRANCH, making
+          # every later sync re-surface them as conflicts. --auto holds until the
           # branch-protection requirements on $TARGET_BRANCH (the required `ci`
           # check) pass. Requires `allow_auto_merge` on the repo, and GitHub
           # rejects it outright once the PR is already mergeable — which is what
