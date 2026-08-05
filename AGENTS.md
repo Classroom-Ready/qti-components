@@ -71,9 +71,13 @@ hand-written content and needs a human. Resolve it on a branch off `classroomrea
 what the workflow does:
 
 - Branch off the integration branch: `git checkout -b sync-upstream-<date> origin/classroomready`.
-- Fetch upstream: `git remote add upstream https://github.com/Citolab/qti-components.git`, then
-  `git fetch upstream main`.
-- Start the merge, leaving conflicts in place: `git merge --no-ff --no-commit upstream/main`.
+- Fetch upstream into a local ref, without configuring a remote:
+  `git fetch --no-tags https://github.com/Citolab/qti-components.git '+main:refs/upstream-sync/main'`.
+  Don't add a remote named `upstream`: `gh` picks the repo it acts on from the remotes and prefers
+  that name, so every later `gh` call would target `Citolab/qti-components` instead of this fork —
+  which is how run 31023605181 failed. If you do add one, pass `--repo` to every `gh` call.
+- Start the merge, leaving conflicts in place:
+  `git merge --no-ff --no-commit refs/upstream-sync/main`.
 - Resolve the hand-written conflicts by hand. Leave the `custom-elements*.json` manifests alone.
 - Reinstall against the merged manifest: `CI=true pnpm install --frozen-lockfile`. A failure
   here means the merged `package.json` and `pnpm-lock.yaml` disagree — fix that first.
