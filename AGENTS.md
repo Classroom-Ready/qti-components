@@ -20,9 +20,10 @@ This is `Classroom-Ready/qti-components`, a fork of `Citolab/qti-components` con
 `classroomready` monorepo as a submodule. `CONTRIBUTING.md` describes the upstream repo's own
 trunk-based workflow (`main`, auto-merge, npm releases) and does not apply here as-is:
 
-- Branch off `classroomready` (this fork's integration branch), not `main` — `main` here tracks
-  upstream via a periodic rebase (`sync-upstream.yml`), so it does not reflect what the fork
-  actually ships.
+- Branch off `classroomready` (this fork's integration branch), not `main` — `main` here is a
+  stale upstream mirror, refreshed only when someone presses GitHub's "Sync fork" button, so it
+  does not reflect what the fork actually ships. `sync-upstream.yml` reads `upstream/main`
+  directly and never writes this fork's `main`.
 - Open PRs targeting `classroomready`. Never push directly to `classroomready`.
 - `gh pr merge --auto` on a `classroomready` PR holds until the required `ci` check passes:
   the branch carries classic protection requiring it. Reviews are not required, so `--auto`
@@ -47,25 +48,32 @@ only branch/merge/release mechanics differ.
 
 ## Resolving Upstream-Sync PR Conflicts
 
-`sync-upstream.yml` does the merge itself. It merges `origin/main` into the bot branch
+`sync-upstream.yml` does the merge itself. It merges `upstream/main` into the bot branch
 `automation/sync-upstream` (cut fresh from `classroomready` each run), rebuilds, commits, and
 opens the PR from that branch. The rebuild is the resolution: `pnpm install`, `pnpm build` and
 `pnpm cem` overwrite the committed build output — the custom-elements manifests and
 `public/mockServiceWorker.js` — from the merged sources, so the generated collisions that used to
 block every sync never reach the PR. Whatever the rebuild writes is committed.
 
-The PR head is the bot branch, never `main` — `main` is an upstream mirror the same workflow
-rewrites daily, so a resolution committed there is clobbered on the next run. The workflow also
-dispatches `ci.yml` against that branch: GitHub raises no `pull_request` run for a PR opened
-with `GITHUB_TOKEN`, so without the dispatch the required `ci` check would never report and
-auto-merge would wait forever.
+It merges `upstream/main` directly and does **not** touch this fork's `main`. The org ruleset on
+`main` requires a pull request and grants bypass only to organization admins, so a bot push to
+`main` is always rejected (`GH013`). `main` is therefore no longer updated automatically —
+refresh it with GitHub's "Sync fork" button when you want it current. Nothing in the
+`classroomready` path depends on it: upstream's commits become ancestors of `classroomready`
+because the bot branch merges `upstream/main` itself.
+
+The workflow also dispatches `ci.yml` against the bot branch: GitHub raises no `pull_request` run
+for a PR opened with `GITHUB_TOKEN`, so without the dispatch the required `ci` check would never
+report and auto-merge would wait forever.
 
 When the job fails with "Conflicts the rebuild could not resolve", the conflict is in
 hand-written content and needs a human. Resolve it on a branch off `classroomready`, mirroring
 what the workflow does:
 
 - Branch off the integration branch: `git checkout -b sync-upstream-<date> origin/classroomready`.
-- Start the merge, leaving conflicts in place: `git merge --no-ff --no-commit origin/main`.
+- Fetch upstream: `git remote add upstream https://github.com/Citolab/qti-components.git`, then
+  `git fetch upstream main`.
+- Start the merge, leaving conflicts in place: `git merge --no-ff --no-commit upstream/main`.
 - Resolve the hand-written conflicts by hand. Leave the `custom-elements*.json` manifests alone.
 - Reinstall against the merged manifest: `CI=true pnpm install --frozen-lockfile`. A failure
   here means the merged `package.json` and `pnpm-lock.yaml` disagree — fix that first.
