@@ -2,12 +2,30 @@
 # proposes carrying those upstream changes into the long-lived `classroomready`
 # customization branch.
 #
-#   1. sync-main   — merge `upstream/main` into `origin/main` and push.
-#   2. propose-pr  — open (or leave the existing) PR merging `main` into
-#                    `classroomready`, but only when the two branches differ.
+#   1. sync-main    — merge `upstream/main` into `origin/main` and push.
+#   2. propose-sync — merge `main` into a bot-owned branch off `classroomready`,
+#                     rebuild the committed custom-elements manifests from the
+#                     merged sources, commit that, and open (or update) the PR.
+#
+# `custom-elements.json` and its per-package siblings are build output that is
+# committed. Upstream and `classroomready` both regenerate them, so every sync
+# collides there even when no hand-written source conflicts. The rebuild is the
+# only automatic resolution: it overwrites those manifests from the merged
+# sources, which settles them without merging text. Anything the rebuild does
+# not settle is a conflict in hand-written content — the job fails and a human
+# resolves it.
+#
+# The `custom-elements*.json` glob picks the manifests up wherever they land;
+# upstream renames and relocates them as packages move.
+#
+# The PR head is a bot branch rather than `main` itself: `main` is a pure
+# upstream mirror that step 1 rewrites daily, so a resolution committed there
+# would be clobbered on the next run. Because the branch and the PR are created
+# with GITHUB_TOKEN, GitHub raises no `pull_request` run for them, so step 2
+# dispatches `ci.yml` itself to satisfy the check `classroomready` requires.
 #
 # Runs daily and on demand. A merge conflict in step 1 fails the run so a human
-# resolves it; the propose-pr job only runs once main is updated cleanly.
+# resolves it; propose-sync only runs once main is updated cleanly.
 
 name: Sync fork with upstream
 
@@ -28,6 +46,7 @@ concurrency:
 env:
   UPSTREAM_REPO: https://github.com/Citolab/qti-components.git
   TARGET_BRANCH: classroomready
+  SYNC_BRANCH: automation/sync-upstream
 
 jobs:
   sync-main:
@@ -52,42 +71,164 @@ jobs:
           git merge --no-edit upstream/main
           git push origin main
 
-  propose-pr:
+  propose-sync:
     needs: sync-main
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          ref: ${{ env.TARGET_BRANCH }}
           fetch-depth: 0
 
-      - name: Open main -> classroomready PR when branches differ
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Decide whether there is anything to carry over
+        id: pending
         run: |
           # main fully contained in the target branch => nothing to carry over.
           if git merge-base --is-ancestor origin/main "origin/$TARGET_BRANCH"; then
             echo "main is already contained in $TARGET_BRANCH; nothing to propose."
-            exit 0
+            echo "changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changes=true" >> "$GITHUB_OUTPUT"
           fi
 
-          pr=$(gh pr list --base "$TARGET_BRANCH" --head main \
+      - name: Configure git identity
+        if: steps.pending.outputs.changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge main into the sync branch
+        if: steps.pending.outputs.changes == 'true'
+        run: |
+          set -euo pipefail
+
+          git switch -C "$SYNC_BRANCH" "origin/$TARGET_BRANCH"
+
+          # Leave conflicts in the worktree: a clean merge exits 0 and stages
+          # everything, a conflicted one exits non-zero and is what the rebuild
+          # is here to settle. MERGE_HEAD tells the two apart from a merge that
+          # never started at all (unrelated histories, a refused merge), which
+          # must still fail the job.
+          git merge --no-ff --no-commit origin/main ||
+            test -f "$(git rev-parse --git-path MERGE_HEAD)"
+
+          echo "Conflicted paths after the merge:"
+          git diff --name-only --diff-filter=U
+
+      # Set the toolchain up from the *merged* tree: pnpm/action-setup reads
+      # `packageManager`, so running it before the merge would install the
+      # merged lockfile with the fork's older pnpm.
+      - name: Install pnpm
+        if: steps.pending.outputs.changes == 'true'
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        if: steps.pending.outputs.changes == 'true'
+        uses: actions/setup-node@v5
+        with:
+          # Matches ci.yml; see the pin rationale there.
+          node-version: 24.15.0
+          cache: 'pnpm'
+
+      - name: Rebuild the generated files and commit the merge
+        if: steps.pending.outputs.changes == 'true'
+        run: |
+          set -euo pipefail
+
+          # Rebuild unconditionally. A conflicted manifest still holds markers,
+          # and a cleanly auto-merged one is worse: valid JSON assembled from
+          # two generations that describes neither tree. Only a rebuild from
+          # the merged sources is authoritative.
+          echo "Rebuilding the custom-elements manifests from the merged sources..."
+          # Conflict markers in package.json or a source file break the rebuild,
+          # so hold the failure and report it alongside the unresolved paths
+          # below — the two together separate "conflict broke the build" from a
+          # transient install failure that a re-run would clear.
+          rebuild_started=$(date +%s)
+          rebuild_failed=""
+          {
+            CI=true pnpm install --frozen-lockfile &&
+            pnpm build &&
+            pnpm cem
+          } || rebuild_failed=1
+
+          # Stage every tracked file the rebuild owns — the manifests plus the
+          # msw worker `pnpm install` writes — so the commit carries what the
+          # build actually produced. A conflicted one is only safe to stage once
+          # the rebuild has demonstrably rewritten it: markers alone miss the
+          # modify/delete case, where the leftover file is marker-free but
+          # describes a tree that no longer exists.
+          generated=$(git ls-files --deduplicate -- \
+            'custom-elements*.json' '**/custom-elements*.json' public/mockServiceWorker.js)
+          while IFS= read -r path; do
+            [ -n "$path" ] || continue
+            if [ -n "$(git ls-files --unmerged -- "$path")" ]; then
+              if [ ! -f "$path" ] || [ "$(stat -c %Y "$path")" -lt "$rebuild_started" ]; then
+                echo "$path was conflicted and the rebuild did not rewrite it; leaving it unmerged."
+                continue
+              fi
+              if grep -q '^<<<<<<< ' "$path"; then
+                echo "$path still has conflict markers; leaving it unmerged."
+                continue
+              fi
+            fi
+            git add "$path"
+          done <<< "$generated"
+
+          # The rebuild is the only automatic resolution. Whatever it did not
+          # settle is a genuine conflict in hand-written content: stop, and let
+          # a human redo the merge per the AGENTS.md procedure. Nothing is
+          # pushed on this path, so the remote branch is never left conflicted.
+          still_unmerged=$(git diff --name-only --diff-filter=U)
+          if [ -n "$still_unmerged" ]; then
+            echo "::error::Conflicts the rebuild could not resolve; see 'Resolving Upstream-Sync PR Conflicts' in AGENTS.md:"
+            echo "$still_unmerged"
+            [ -z "$rebuild_failed" ] || echo "The rebuild also failed; check the log above for whether that is a cause or a consequence."
+            exit 1
+          fi
+
+          if [ -n "$rebuild_failed" ]; then
+            echo "::error::The merge left no conflicts, but the rebuild failed; see the log above."
+            exit 1
+          fi
+
+          git commit --no-edit
+          # Only this workflow ever writes the branch, and GitHub deletes it on
+          # merge, so a plain force push is safe and survives the recreation.
+          git push --force origin "$SYNC_BRANCH"
+
+      - name: Open the sync PR when one is not already up
+        if: steps.pending.outputs.changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pr=$(gh pr list --base "$TARGET_BRANCH" --head "$SYNC_BRANCH" \
             --state open --json number --jq '.[0].number // empty')
           if [ -n "$pr" ]; then
-            echo "PR #$pr is already open; it updates automatically as main moves."
+            echo "PR #$pr is already open; the force push above updated it."
           else
             pr=$(gh pr create \
               --base "$TARGET_BRANCH" \
-              --head main \
+              --head "$SYNC_BRANCH" \
               --title "Sync: merge upstream changes from main into $TARGET_BRANCH" \
-              --body "Automated by the **Sync fork with upstream** workflow. Carries the latest \`main\` (synced from upstream \`Citolab/qti-components\`) into \`$TARGET_BRANCH\`. Review the upstream changes before merging.")
+              --body "Automated by the **Sync fork with upstream** workflow. Carries the latest \`main\` (synced from upstream \`Citolab/qti-components\`) into \`$TARGET_BRANCH\`. Conflicts in the generated custom-elements manifests were resolved by rebuilding them from the merged sources. Review the upstream changes before merging.")
           fi
+
+          # GitHub suppresses workflow runs for events raised with GITHUB_TOKEN,
+          # so neither the push nor `gh pr create` above starts the `ci` run
+          # that $TARGET_BRANCH requires — the PR would wait on a check that
+          # never arrives. workflow_dispatch is the documented exception, so ask
+          # for the run explicitly against the branch head we just pushed.
+          echo "Dispatching CI for $SYNC_BRANCH"
+          gh workflow run ci.yml --ref "$SYNC_BRANCH" -f branch="$SYNC_BRANCH"
 
           # Pin the merge to a merge commit. A squash/rebase would rewrite these
           # commits and break main's ancestry in $TARGET_BRANCH, making every
           # later sync re-surface them as conflicts. --auto holds until the
-          # branch-protection requirements on $TARGET_BRANCH (review/checks) pass.
-          # Requires `allow_auto_merge` on the repo and at least one pending
-          # requirement on $TARGET_BRANCH, else GitHub rejects enabling it.
+          # branch-protection requirements on $TARGET_BRANCH (the required `ci`
+          # check) pass. Requires `allow_auto_merge` on the repo, and GitHub
+          # rejects it outright once the PR is already mergeable — which is what
+          # a re-run against a green PR hits, hence the plain merge fallback.
           echo "Enabling auto-merge (merge commit) on $pr"
-          gh pr merge "$pr" --merge --auto
+          gh pr merge "$pr" --merge --auto || gh pr merge "$pr" --merge
