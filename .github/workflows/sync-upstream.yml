@@ -131,7 +131,7 @@ jobs:
           node-version: 24.15.0
           cache: 'pnpm'
 
-      - name: Rebuild the manifests and commit the merge
+      - name: Rebuild the generated files and commit the merge
         if: steps.pending.outputs.changes == 'true'
         run: |
           set -euo pipefail
@@ -153,15 +153,14 @@ jobs:
             pnpm cem
           } || rebuild_failed=1
 
-          # msw rewrites this on install; it is an artifact, not merge content.
-          git checkout -- public/mockServiceWorker.js || true
-
-          # Stage every tracked manifest, so the commit carries what the build
-          # actually produced. A conflicted one is only safe to stage once the
-          # rebuild has demonstrably rewritten it: markers alone miss the
+          # Stage every tracked file the rebuild owns — the manifests plus the
+          # msw worker `pnpm install` writes — so the commit carries what the
+          # build actually produced. A conflicted one is only safe to stage once
+          # the rebuild has demonstrably rewritten it: markers alone miss the
           # modify/delete case, where the leftover file is marker-free but
           # describes a tree that no longer exists.
-          manifests=$(git ls-files --deduplicate -- 'custom-elements*.json' '**/custom-elements*.json')
+          generated=$(git ls-files --deduplicate -- \
+            'custom-elements*.json' '**/custom-elements*.json' public/mockServiceWorker.js)
           while IFS= read -r path; do
             [ -n "$path" ] || continue
             if [ -n "$(git ls-files --unmerged -- "$path")" ]; then
@@ -175,7 +174,7 @@ jobs:
               fi
             fi
             git add "$path"
-          done <<< "$manifests"
+          done <<< "$generated"
 
           # The rebuild is the only automatic resolution. Whatever it did not
           # settle is a genuine conflict in hand-written content: stop, and let

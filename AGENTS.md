@@ -49,9 +49,10 @@ only branch/merge/release mechanics differ.
 
 `sync-upstream.yml` does the merge itself. It merges `origin/main` into the bot branch
 `automation/sync-upstream` (cut fresh from `classroomready` each run), rebuilds, commits, and
-opens the PR from that branch. The rebuild is the resolution: `pnpm build` and `pnpm cem`
-overwrite the committed custom-elements manifests from the merged sources, so the generated
-collisions that used to block every sync never reach the PR.
+opens the PR from that branch. The rebuild is the resolution: `pnpm install`, `pnpm build` and
+`pnpm cem` overwrite the committed build output — the custom-elements manifests and
+`public/mockServiceWorker.js` — from the merged sources, so the generated collisions that used to
+block every sync never reach the PR. Whatever the rebuild writes is committed.
 
 The PR head is the bot branch, never `main` — `main` is an upstream mirror the same workflow
 rewrites daily, so a resolution committed there is clobbered on the next run. The workflow also
@@ -70,9 +71,8 @@ what the workflow does:
   here means the merged `package.json` and `pnpm-lock.yaml` disagree — fix that first.
 - Rebuild the manifests: `pnpm build`, then `pnpm cem`.
 - Confirm no markers survive: `git grep -l '^<<<<<<< ' -- 'custom-elements*.json' '**/custom-elements*.json'`.
-- `public/mockServiceWorker.js` is an msw install artifact, not merge content — restore it:
-  `git checkout -- public/mockServiceWorker.js`.
-- Stage the rebuilt manifests, then commit: `git add 'custom-elements*.json' '**/custom-elements*.json'`.
+- Stage everything the rebuild wrote — the manifests and the msw worker `pnpm install` rewrites —
+  then commit: `git add 'custom-elements*.json' '**/custom-elements*.json' public/mockServiceWorker.js`.
 - Verify the merged tree with `pnpm tsc` and `pnpm lint` before pushing.
 
 GitHub cannot repoint an open PR's head branch, so open a new PR from your branch and close the
