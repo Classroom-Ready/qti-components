@@ -7,7 +7,6 @@ import { fireEvent } from 'storybook/test';
 
 import { getAssessmentItemFromTestContainerByDataTitle } from '../../../../../tools/testing/test-utils.js';
 
-import type { ConfigContext } from '@qti-components/base';
 import type { QtiSimpleChoice } from '@qti-components/interactions';
 import type { TestShowCorrectResponse } from './test-show-correct-response';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
@@ -136,7 +135,9 @@ export const TestFullCorrectResponse: Story = {
     </qti-test>
   `,
   play: async ({ canvasElement }) => {
-    const qtiTest = canvasElement.querySelector('qti-test') as { configContext?: ConfigContext } | null;
+    const qtiTest = canvasElement.querySelector('qti-test') as unknown as {
+      configContext?: Record<string, unknown>;
+    } | null;
     if (qtiTest) {
       qtiTest.configContext = {
         ...(qtiTest.configContext || {}),
