@@ -37,15 +37,11 @@ export const qtiTransformTest = (): transformTestApi => {
 
   const api: transformTestApi = {
     async load(uri, signal) {
-      return new Promise<transformTestApi>((resolve, _) => {
-        loadXML(uri, signal).then(xml => {
-          xmlFragment = xml;
-          xmlUri = uri;
+      xmlFragment = await loadXML(uri, signal);
+      xmlUri = uri;
 
-          api.path(uri.substring(0, uri.lastIndexOf('/')));
-          return resolve(api);
-        });
-      });
+      api.path(uri.substring(0, uri.lastIndexOf('/')));
+      return api;
     },
     parse(xmlString: string) {
       xmlFragment = parseXML(xmlString);
