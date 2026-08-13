@@ -8,5 +8,9 @@ pnpm-lock.yaml
 tsconfig.json
 
 public/assets
+# `pnpm install` regenerates this worker via msw's postinstall, in msw's own
+# style. Formatting it makes every install dirty the working tree, so it is
+# committed exactly as msw writes it — see AGENTS.md.
+public/mockServiceWorker.js
 LICENSE.md
 QTI-Components.code-workspace
