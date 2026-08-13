@@ -46,6 +46,14 @@ only branch/merge/release mechanics differ.
 - Type check: `pnpm tsc`
 - Lint: `pnpm lint`
 
+## Committed Generated Files
+
+`public/mockServiceWorker.js` is written by msw's postinstall on every `pnpm install`, in msw's
+own style, and is committed byte-for-byte as msw produces it — `.prettierignore` lists it so
+nothing reformats it. Commit whatever `pnpm install` writes and never tidy it by hand: a diff
+there means the msw version moved, and a reformatted copy makes every subsequent install dirty
+the working tree.
+
 ## Resolving Upstream-Sync PR Conflicts
 
 `sync-upstream.yml` does the merge itself. It merges `upstream/main` into the bot branch
