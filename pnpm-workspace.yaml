@@ -10,14 +10,21 @@ allowBuilds:
   '@swc/core': true
   esbuild: true
   msw: true
-  puppeteer: true
   rs-module-lexer: true
   unrs-resolver: true
 
 # pnpm v11 reads `overrides` from here; the package.json `pnpm.overrides` field
 # it used in v10 is no longer read.
+#
+# `mdx-mermaid` lists puppeteer as an optional dependency, used only by its
+# remark plugin to pre-render diagrams to SVG. This repo imports the client-side
+# `Mermaid` component instead, so puppeteer is dead weight — and it drags in
+# `@puppeteer/browsers` -> `extract-zip`, which has an unpatched symlink path
+# traversal advisory (GHSA-jmr9-qjv8-65gv) and no fixed release. `-` drops the
+# optional dependency, and with it the whole vulnerable subtree.
 overrides:
   basic-ftp: '^5.2.0'
+  mdx-mermaid>puppeteer: '-'
 
 patchedDependencies:
   '@wc-toolkit/storybook-helpers@10.2.1': patches/@wc-toolkit__storybook-helpers@10.2.1.patch
