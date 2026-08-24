@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -81,6 +81,9 @@ jobs:
         run: |
           pnpm run changeset:version
 
+          # Keep generated manifests aligned with versioned sources in release commits.
+          pnpm run cem
+
           if git diff --quiet; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
             echo "No pending changesets. Nothing to release."
@@ -92,7 +95,7 @@ jobs:
       - name: Commit release version updates
         if: ${{ !inputs.dry_run && steps.version.outputs.has_changes == 'true' }}
         run: |
-          git add .changeset packages
+          git add .changeset packages custom-elements.json
           git commit -m "chore(release): changesets version [skip ci]"
 
       - name: Build workspace
@@ -110,7 +113,9 @@ jobs:
           printf '%s\n' 'registry=https://registry.npmjs.org/' 'provenance=true' > "$HOME/.npmrc"
 
       - name: Publish changesets
+        id: publish
         if: ${{ !inputs.dry_run && steps.version.outputs.has_changes == 'true' }}
+        continue-on-error: true
         shell: bash
         run: |
           # Unset pnpm-injected npm_config_* vars that npm doesn't understand
@@ -123,7 +128,7 @@ jobs:
           PNPM_GIT_CHECKS: 'false'
 
       - name: Reconcile missing npm publishes
-        if: ${{ !inputs.dry_run }}
+        if: ${{ always() && !inputs.dry_run && steps.version.outputs.has_changes == 'true' }}
         shell: bash
         run: |
           for var in $(env | grep -oP '^npm_config_\w+' | grep -vE '^npm_config_(registry|provenance|cache|userconfig)$'); do
