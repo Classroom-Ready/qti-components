@@ -110,7 +110,18 @@ jobs:
             test -f "$(git rev-parse --git-path MERGE_HEAD)"
 
           echo "Conflicted paths after the merge:"
-          git diff --name-only --diff-filter=U
+          conflicted=$(git diff --name-only --diff-filter=U)
+          echo "$conflicted"
+
+          # The rebuild below cannot settle a conflicted `package.json`: it is
+          # hand-written, `pnpm install` needs it parseable, and the pnpm setup
+          # step in between reads `packageManager` out of it as JSON. Report the
+          # conflicts here instead, with the same pointer the rebuild step uses.
+          if [ -n "$(git ls-files --unmerged -- package.json)" ]; then
+            echo "::error::package.json is conflicted, so the rebuild cannot resolve this merge; see 'Resolving Upstream-Sync PR Conflicts' in AGENTS.md:"
+            echo "$conflicted"
+            exit 1
+          fi
 
       # Set the toolchain up from the *merged* tree: pnpm/action-setup reads
       # `packageManager`, so running it before the merge would install the
