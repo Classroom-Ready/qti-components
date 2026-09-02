@@ -24,28 +24,6 @@
 - Type check: `pnpm tsc`
 - Lint: `pnpm lint`
 
-## Resolving Upstream-Sync PR Conflicts
-
-Sync PRs (`main` -> `classroomready`) usually conflict only in generated custom-elements
-manifests: `custom-elements.json` (root) and `packages/qti-components/custom-elements.json`.
-Regenerate these from the merged source instead of hand-editing the conflict markers.
-
-Resolve on a fresh branch off `classroomready`, not on `main` (which is rebased by
-`sync-upstream.yml` and would clobber the fix). GitHub cannot repoint an existing PR's head
-branch, so open a new PR from this branch and close the auto-generated sync PR as superseded.
-
-- Branch off the integration branch: `git checkout -b sync-upstream-<date> origin/classroomready`.
-- Start the merge, leaving conflicts in place: `git merge --no-ff --no-commit origin/main`.
-- Reinstall against the merged manifest: `CI=true pnpm install --frozen-lockfile`. A failure
-  here means the merged `package.json` and `pnpm-lock.yaml` disagree — fix that first.
-- Regenerate `packages/qti-components/custom-elements.json`: `pnpm build`.
-- Regenerate the root `custom-elements.json` (and the interactions manifest): `pnpm cem`.
-- Confirm no markers survive: `grep -c '<<<<<<<' custom-elements.json packages/qti-components/custom-elements.json`.
-- `public/mockServiceWorker.js` is an msw install artifact, not merge content — restore it:
-  `git checkout -- public/mockServiceWorker.js`.
-- Stage the regenerated manifests, then commit: `git add custom-elements.json packages/qti-components/custom-elements.json`.
-- Verify the merged tree with `pnpm tsc` and `pnpm lint` before pushing.
-
 ## Coding And Testing Defaults
 
 - Prefer small, focused changes with clear file-level intent.

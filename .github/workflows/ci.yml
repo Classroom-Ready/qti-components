@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - classroomready
   push:
     branches:
       - main
@@ -23,10 +22,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          # Empty on pull_request/push events, so checkout uses the default ref
-          # (the PR merge commit / pushed sha) and CI tests the actual change.
-          # workflow_dispatch supplies inputs.branch (defaults to main).
-          ref: ${{ inputs.branch }}
+          # `github.ref`, not 'main'. `inputs` is empty on anything but workflow_dispatch, so the
+          # fallback is what every pull_request and push actually used — and it was the literal
+          # string 'main'. This job therefore tested main on every PR, never the PR's own code:
+          # run 33399522449 reported main's 1166 tests against a head SHA whose branch has 1169,
+          # and failed on an assertion the branch fixes.
+          #
+          # A green check was worth nothing either, which is the more dangerous half: a broken main
+          # at least made it visible. On pull_request `github.ref` is refs/pull/N/merge, so this
+          # tests the merge result, which is the thing being asked about. workflow_dispatch still
+          # gets its branch input.
+          ref: ${{ inputs.branch || github.ref }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -90,3 +96,9 @@ jobs:
             echo "⚠️ No changeset found. If this PR changes published package behavior, a maintainer will add one before merging."
             echo "You can optionally add one yourself with: pnpm run changeset"
           fi
+
+      # Hard failure, unlike the advisory step above: an unbumped umbrella is not a stale
+      # version number, it is a package that never gets published at all. See the header of
+      # tools/changesets/check-umbrella-bump.mjs.
+      - name: Check the umbrella is bumped with the workspace
+        run: pnpm run changeset:check-umbrella

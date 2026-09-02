@@ -5,6 +5,8 @@ export * from '../components/qti-assessment-section/qti-assessment-section';
 export * from '../components/qti-assessment-test/qti-assessment-test';
 export * from '../components/qti-test-part/qti-test-part';
 export * from '../components/qti-test-feedback/qti-test-feedback';
+export * from '../components/qti-outcome-processing/qti-outcome-processing';
+export * from '../components/qti-test-variables/qti-test-variables';
 
 export * from './test-navigation/test-navigation';
 export * from './test-next/test-next';
@@ -12,7 +14,6 @@ export * from './test-prev/test-prev';
 export * from './test-view-toggle/test-view';
 export * from './test-item-link/test-item-link';
 export * from './test-end-attempt/test-end-attempt';
-export * from './test-show-correct-response/test-show-correct-response';
 export * from './test-paging-buttons-stamp/test-paging-buttons-stamp';
 export * from './test-container/test-container';
 export * from './test-print-item-variables/test-print-item-variables';

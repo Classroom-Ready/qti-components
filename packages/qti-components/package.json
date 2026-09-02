@@ -1,7 +1,7 @@
 {
   "name": "@citolab/qti-components",
   "description": "QTI component utilities",
-  "version": "7.28.1",
+  "version": "8.0.1",
   "author": "",
   "dependencies": {
     "@heximal/templates": "^0.1.5",
@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@qti-components/base": "workspace:^",
+    "@qti-components/corrections": "workspace:^",
     "@qti-components/elements": "workspace:^",
     "@qti-components/interactions": "workspace:^",
     "@qti-components/item": "workspace:^",
@@ -52,6 +53,10 @@
       "types": "./dist/loader.d.ts",
       "import": "./dist/loader.js"
     },
+    "./corrections": {
+      "types": "./dist/corrections.d.ts",
+      "import": "./dist/corrections.js"
+    },
     "./qti-transformers": {
       "types": "./dist/transformers.d.ts",
       "import": "./dist/transformers.js"
@@ -59,7 +64,10 @@
     "./item.css": "./dist/item.css",
     "./cdn/*": "./cdn/*",
     "./package.json": "./package.json",
-    "./react": "./dist/qti-components-jsx.d.ts"
+    "./react": {
+      "types": "./dist/qti-components-jsx.d.ts",
+      "default": "./dist/qti-components-jsx.js"
+    }
   },
   "files": [
     "dist",
@@ -84,11 +92,11 @@
     "attw": "attw --pack --profile esm-only --format table",
     "build": "run-s cem:react-types build:bundle",
     "build:bundle": "run-p tsup css",
-    "cem:react-types": "CEM_OUTDIR=packages/qti-components/ pnpm -C ../.. run cem:core",
+    "cem:react-types": "CEM_OUTDIR=packages/qti-components/ pnpm -C ../.. run cem:core && node -e \"require('fs').writeFileSync('dist/qti-components-jsx.js','export {};\\n')\"",
     "clean": "rm -rf dist cdn",
     "css": "postcss ../qti-theme/src/item.css -d dist -m",
     "publint": "publint",
-    "tsup": "tsup",
+    "tsup": "NODE_OPTIONS=--max-old-space-size=8192 tsup",
     "yalc": "yalc publish",
     "yalc:push": "yalc push",
     "deploy": "cd ../interactions/core && pnpm run build && cd ../../qti-components && pnpm run build && yalc push",
