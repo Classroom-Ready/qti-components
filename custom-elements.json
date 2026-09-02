@@ -27269,7 +27269,8 @@
                 "type": {
                   "text": "boolean"
                 }
-              }
+              },
+              "description": "The QTI `show-feedback` constraint governs exactly one state: after the end of\nthe last attempt. Up to that point the spec requires any applicable feedback to\nbe shown — \"a value of max-attempts greater than 1, by definition, indicates\nthat any applicable feedback must be shown\" — and only \"once the maximum number\nof allowed attempts have been used (or for adaptive items, completionStatus has\nbeen set to completed)\" does `show-feedback` decide.\n\nThis only ever forces feedback off, so `show-feedback` being true settles it:\nthere is no state in which the constraint hides feedback. It defaults to\nfalse, and an absent value suppresses once the attempts are gone.\n\nThat leaves one question — is the item out of attempts? — and the two item\nkinds answer it from different variables, so each reads only its own."
             },
             {
               "kind": "method",
@@ -29154,6 +29155,7 @@
                   "text": "boolean"
                 }
               },
+              "description": "The QTI `show-feedback` constraint governs exactly one state: after the end of\nthe last attempt. Up to that point the spec requires any applicable feedback to\nbe shown — \"a value of max-attempts greater than 1, by definition, indicates\nthat any applicable feedback must be shown\" — and only \"once the maximum number\nof allowed attempts have been used (or for adaptive items, completionStatus has\nbeen set to completed)\" does `show-feedback` decide.\n\nThis only ever forces feedback off, so `show-feedback` being true settles it:\nthere is no state in which the constraint hides feedback. It defaults to\nfalse, and an absent value suppresses once the attempts are gone.\n\nThat leaves one question — is the item out of attempts? — and the two item\nkinds answer it from different variables, so each reads only its own.",
               "inheritedFrom": {
                 "name": "QtiFeedback",
                 "module": "packages/qti-base/src/abstract/qti-feedback.ts"
@@ -29371,6 +29373,7 @@
                   "text": "boolean"
                 }
               },
+              "description": "The QTI `show-feedback` constraint governs exactly one state: after the end of\nthe last attempt. Up to that point the spec requires any applicable feedback to\nbe shown — \"a value of max-attempts greater than 1, by definition, indicates\nthat any applicable feedback must be shown\" — and only \"once the maximum number\nof allowed attempts have been used (or for adaptive items, completionStatus has\nbeen set to completed)\" does `show-feedback` decide.\n\nThis only ever forces feedback off, so `show-feedback` being true settles it:\nthere is no state in which the constraint hides feedback. It defaults to\nfalse, and an absent value suppresses once the attempts are gone.\n\nThat leaves one question — is the item out of attempts? — and the two item\nkinds answer it from different variables, so each reads only its own.",
               "inheritedFrom": {
                 "name": "QtiFeedback",
                 "module": "packages/qti-base/src/abstract/qti-feedback.ts"
@@ -29642,6 +29645,7 @@
                   "text": "boolean"
                 }
               },
+              "description": "The QTI `show-feedback` constraint governs exactly one state: after the end of\nthe last attempt. Up to that point the spec requires any applicable feedback to\nbe shown — \"a value of max-attempts greater than 1, by definition, indicates\nthat any applicable feedback must be shown\" — and only \"once the maximum number\nof allowed attempts have been used (or for adaptive items, completionStatus has\nbeen set to completed)\" does `show-feedback` decide.\n\nThis only ever forces feedback off, so `show-feedback` being true settles it:\nthere is no state in which the constraint hides feedback. It defaults to\nfalse, and an absent value suppresses once the attempts are gone.\n\nThat leaves one question — is the item out of attempts? — and the two item\nkinds answer it from different variables, so each reads only its own.",
               "inheritedFrom": {
                 "name": "QtiFeedback",
                 "module": "packages/qti-base/src/abstract/qti-feedback.ts"
@@ -43419,6 +43423,7 @@
                   "text": "boolean"
                 }
               },
+              "description": "The QTI `show-feedback` constraint governs exactly one state: after the end of\nthe last attempt. Up to that point the spec requires any applicable feedback to\nbe shown — \"a value of max-attempts greater than 1, by definition, indicates\nthat any applicable feedback must be shown\" — and only \"once the maximum number\nof allowed attempts have been used (or for adaptive items, completionStatus has\nbeen set to completed)\" does `show-feedback` decide.\n\nThis only ever forces feedback off, so `show-feedback` being true settles it:\nthere is no state in which the constraint hides feedback. It defaults to\nfalse, and an absent value suppresses once the attempts are gone.\n\nThat leaves one question — is the item out of attempts? — and the two item\nkinds answer it from different variables, so each reads only its own.",
               "inheritedFrom": {
                 "name": "QtiFeedback",
                 "module": "packages/qti-base/src/abstract/qti-feedback.ts"
