@@ -1,7 +1,7 @@
 {
   "name": "@qti-components/extended-text-interaction",
   "description": "QTI extended-text-interaction interaction",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "author": "",
   "dependencies": {
     "@qti-components/base": "workspace:^",
@@ -30,7 +30,9 @@
     "attw": "attw --profile esm-only --pack",
     "build": "tsc --paths null",
     "clean": "rm -rf dist",
-    "publish": "node ../../../tools/publish-if-needed.mjs"
+    "publish": "node ../../../tools/publish-if-needed.mjs",
+    "yalc": "yalc publish",
+    "yalc:push": "yalc push"
   },
   "sideEffects": true,
   "type": "module",
@@ -51,6 +53,10 @@
     "./styles": {
       "types": "./dist/qti-extended-text-interaction.styles.d.ts",
       "import": "./dist/qti-extended-text-interaction.styles.js"
+    },
+    "./elements": {
+      "types": "./dist/elements.d.ts",
+      "import": "./dist/elements.js"
     }
   },
   "repository": {

@@ -9,9 +9,10 @@
  * const xml = qtiTransformer.xml();
  */
 
+import { warnMissingSeed } from './shared/missing-seed-warning';
 import { loadXML, parseXML, setLocation, toHTML } from './shared/xml';
 import { itemsFromTest } from './test/items';
-import { shuffleSectionsOrdering } from './test/shuffle-sections';
+import { hasShuffleOrdering, shuffleSectionsOrdering } from './test/shuffle-sections';
 
 export type transformTestApi = {
   load: (uri: string, signal?: AbortSignal) => Promise<transformTestApi>;
@@ -27,7 +28,7 @@ export type transformTestApi = {
   items: () => { identifier: string; href: string; category: string }[];
   html: () => string;
   xml: () => string;
-  htmlDoc: () => DocumentFragment;
+  htmlDoc: (registry?: CustomElementRegistry) => DocumentFragment;
   xmlDoc: () => XMLDocument;
 };
 
@@ -61,13 +62,17 @@ export const qtiTransformTest = (): transformTestApi => {
       return api;
     },
     shuffleOrdering(seed?: string | number | null) {
+      // No section asks to be shuffled: leave the test alone, and stay quiet
+      // about a missing seed that would never have been used.
+      if (!hasShuffleOrdering(xmlFragment)) {
+        return api;
+      }
+
       const normalizedSeed = typeof seed === 'string' ? seed.trim() : seed;
 
       if (normalizedSeed === null || normalizedSeed === undefined || normalizedSeed === '') {
         const fallbackSeed = xmlUri || 'default-test-seed';
-        console.warn(
-          `[qtiTransformTest] No QTI_CONTEXT.seed provided; using "${fallbackSeed}" as deterministic fallback seed.`
-        );
+        warnMissingSeed('qtiTransformTest', fallbackSeed);
         shuffleSectionsOrdering(xmlFragment, fallbackSeed);
         return api;
       }
@@ -84,8 +89,8 @@ export const qtiTransformTest = (): transformTestApi => {
     xml(): string {
       return new XMLSerializer().serializeToString(xmlFragment);
     },
-    htmlDoc() {
-      return toHTML(xmlFragment);
+    htmlDoc(registry?: CustomElementRegistry) {
+      return toHTML(xmlFragment, registry);
     },
     xmlDoc(): XMLDocument {
       return xmlFragment;
