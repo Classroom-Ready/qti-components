@@ -5,7 +5,7 @@ import type { QtiAssessmentItem } from '@qti-components/elements';
 
 type CorrectionAssessmentItem = QtiAssessmentItem & {
   showCorrectResponse(show: boolean): void;
-  showCandidateCorrection(show: boolean): void;
+  showCandidateCorrection(show: boolean, accumulate?: boolean): void;
 };
 
 /** Test navigation extension that routes correction controls to the active item. */
@@ -39,7 +39,9 @@ export class TestNavigationCorrection extends TestNavigation {
    * the assessment opted in via the standard `qti-item-session-control
    * show-solution` (QTI 3.0 ItemSessionControl.show-solution) — the player takes
    * no opinion of its own:
-   * - candidate correction (a mark on the learner's selection) after every attempt;
+   * - candidate correction (a mark on the learner's selection) after every
+   *   attempt, accumulating so each scored wrong pick stays flagged — two wrong
+   *   attempts leave two marks;
    * - the correct response (a mark on the right answer) once the item is done —
    *   the candidate reached the optimal outcome, or ran out of attempts.
    */
@@ -51,7 +53,7 @@ export class TestNavigationCorrection extends TestNavigation {
     if (!assessmentItem || !computedItem?.showSolution) return;
 
     const correctable = assessmentItem as Partial<CorrectionAssessmentItem>;
-    correctable.showCandidateCorrection?.(true);
+    correctable.showCandidateCorrection?.(true, true);
     correctable.showCorrectResponse?.(done);
   }
 }

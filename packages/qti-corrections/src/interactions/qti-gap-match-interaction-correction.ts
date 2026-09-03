@@ -4,8 +4,14 @@ import { DragDropCorrectionMixin } from '../mixins/drag-drop-correction.mixin';
 import { parsePairs, type CorrectableChoice } from './shared';
 
 export class QtiGapMatchInteractionCorrection extends DragDropCorrectionMixin(QtiGapMatchInteraction) {
-  public override toggleCandidateCorrection(show: boolean): void {
-    super.toggleCandidateCorrection(show);
+  /**
+   * `accumulate` is threaded to the base implementation but changes nothing
+   * here: these marks live on the drags currently placed in each gap, so they
+   * already follow the candidate's placement and there is no earlier mark left
+   * behind to keep.
+   */
+  public override toggleCandidateCorrection(show: boolean, accumulate = false): void {
+    super.toggleCandidateCorrection(show, accumulate);
     const matches = parsePairs(this.correctResponse);
 
     for (const target of this.querySelectorAll('qti-gap')) {

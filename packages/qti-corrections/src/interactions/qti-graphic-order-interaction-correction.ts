@@ -31,12 +31,15 @@ export class QtiGraphicOrderInteractionCorrection extends CandidateCorrectionMix
     this.refreshLocatorPins();
   }
 
-  public override toggleCandidateCorrection(show: boolean): void {
-    super.toggleCandidateCorrection(show);
+  public override toggleCandidateCorrection(show: boolean, accumulate = false): void {
+    super.toggleCandidateCorrection(show, accumulate);
     const response = this.correctResponse;
     const correctOrder = response ? (Array.isArray(response) ? response : [response]) : [];
     for (const hotspot of this._choiceElements as CorrectableOrderedHotspot[]) {
-      hotspot.candidateCorrection = null;
+      // Accumulating keeps the marks from earlier attempts; hiding always clears.
+      if (!accumulate || !show) {
+        hotspot.candidateCorrection = null;
+      }
       if (show && hotspot.order != null) {
         hotspot.candidateCorrection = correctOrder[hotspot.order - 1] === hotspot.identifier ? 'correct' : 'incorrect';
       }

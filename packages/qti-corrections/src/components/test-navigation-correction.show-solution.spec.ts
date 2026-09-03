@@ -121,7 +121,8 @@ describe('TestNavigationCorrection show-solution', () => {
 
     endAttempt(item, { variables: scored(0), numAttempts: 1 });
 
-    expect(showCandidateCorrection).toHaveBeenCalledWith(true);
+    // Marks accumulate, so a pick from an earlier attempt stays flagged.
+    expect(showCandidateCorrection).toHaveBeenCalledWith(true, true);
     // suboptimal with an attempt remaining → not done → correct answer stays hidden.
     expect(showCorrectResponse).toHaveBeenCalledWith(false);
   });
@@ -131,7 +132,7 @@ describe('TestNavigationCorrection show-solution', () => {
 
     endAttempt(item, { variables: scored(0), numAttempts: 2 });
 
-    expect(showCandidateCorrection).toHaveBeenCalledWith(true);
+    expect(showCandidateCorrection).toHaveBeenCalledWith(true, true);
     expect(showCorrectResponse).toHaveBeenCalledWith(true);
   });
 
@@ -140,8 +141,8 @@ describe('TestNavigationCorrection show-solution', () => {
 
     endAttempt(item, { variables: scored(1), numAttempts: 1 });
 
-    // Still marks the candidate's pick (accumulate keeps earlier ✘)…
-    expect(showCandidateCorrection).toHaveBeenCalledWith(true);
+    // Still marks the candidate's pick, accumulating onto any earlier ✘…
+    expect(showCandidateCorrection).toHaveBeenCalledWith(true, true);
     // …and reveals the correct answer (✔) as soon as SCORE reaches MAXSCORE.
     expect(showCorrectResponse).toHaveBeenCalledWith(true);
   });

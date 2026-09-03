@@ -26,8 +26,14 @@ export class QtiSelectPointInteractionCorrection extends CandidateCorrectionMixi
     `
   ];
 
-  public override toggleCandidateCorrection(show: boolean): void {
-    super.toggleCandidateCorrection(show);
+  /**
+   * `accumulate` is threaded to the base implementation but changes nothing
+   * here: the verdicts are rebuilt from the points the candidate has currently
+   * placed, so they already follow the response and there is no earlier mark
+   * left behind to keep.
+   */
+  public override toggleCandidateCorrection(show: boolean, accumulate = false): void {
+    super.toggleCandidateCorrection(show, accumulate);
     const previous = this.#responseCorrection;
     this.#responseCorrection = [];
     if (!show) {
