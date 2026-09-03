@@ -16495,7 +16495,7 @@
                 "text": "any[] | NodeListOf<QtiAssociableHotspot>"
               },
               "parsedType": {
-                "text": "any[] | { item: {  }, forEach: {  }, entries: {  }, keys: {  }, values: {  }, __@iterator@515: {  }, length: number }"
+                "text": "any[] | { item: {  }, forEach: {  }, entries: {  }, keys: {  }, values: {  }, __@iterator@534: {  }, length: number }"
               }
             },
             {
@@ -34720,6 +34720,16 @@
               }
             },
             {
+              "kind": "field",
+              "name": "#persistCandidateCorrection",
+              "privacy": "private",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether a response change should leave the candidate correction on screen.\n\nNot set directly: it is derived by `showCandidateCorrection`. Showing marks\nin accumulate mode turns it on, so a mark survives the candidate picking\nsomething else and the next attempt can add to it; hiding, or a plain\nnon-accumulating show, turns it back off."
+            },
+            {
               "kind": "method",
               "name": "#processTemplates",
               "privacy": "private",
@@ -35031,10 +35041,15 @@
                   "type": {
                     "text": "boolean"
                   }
+                },
+                {
+                  "name": "accumulate",
+                  "default": "false",
+                  "description": "Add to the marks already on screen rather than recomputing\nthem from the current response, so a wrong pick from an earlier attempt\nstays flagged. This is what an end-of-attempt review needs, so it also\nkeeps the marks across the candidate's next selection."
                 }
               ],
               "type": {
-                "text": "showCandidateCorrection(show: boolean) => void"
+                "text": "showCandidateCorrection(show: boolean, accumulate = false) => void"
               }
             },
             {
@@ -36135,7 +36150,7 @@
                   }
                 }
               ],
-              "description": "Reflect correctness back to the candidate after an ended attempt, for items\nthe assessment opted in via the standard `qti-item-session-control\nshow-solution` (QTI 3.0 ItemSessionControl.show-solution) — the player takes\nno opinion of its own:\n- candidate correction (a mark on the learner's selection) after every attempt;\n- the correct response (a mark on the right answer) once the item is done —\n  the candidate reached the optimal outcome, or ran out of attempts.",
+              "description": "Reflect correctness back to the candidate after an ended attempt, for items\nthe assessment opted in via the standard `qti-item-session-control\nshow-solution` (QTI 3.0 ItemSessionControl.show-solution) — the player takes\nno opinion of its own:\n- candidate correction (a mark on the learner's selection) after every\n  attempt, accumulating so each scored wrong pick stays flagged — two wrong\n  attempts leave two marks;\n- the correct response (a mark on the right answer) once the item is done —\n  the candidate reached the optimal outcome, or ran out of attempts.",
               "inheritedFrom": {
                 "name": "TestNavigation",
                 "module": "packages/qti-test/src/components/test-navigation/test-navigation.ts"

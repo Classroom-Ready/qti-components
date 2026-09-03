@@ -1,12 +1,6 @@
 import { html, nothing, render } from 'lit';
 
-import { qtiBaseElements } from '@qti-components/base/elements';
-import { qtiContentElements } from '@qti-components/elements/elements';
-import { qtiInteractionElements } from '@qti-components/interactions/elements';
-import { qtiItemElements } from '@qti-components/item/elements';
-import { qtiProcessingElements } from '@qti-components/processing/elements';
-import { qtiCorrectionElements } from '@qti-components/corrections/elements';
-import { qtiTestElements } from '@qti-components/test/elements';
+import { createCorrectionRegistry } from '@qti-components/corrections';
 
 import itemCss from '../../../../../packages/qti-theme/src/item.css?inline';
 import kennisnetCss from './kennisnet.css?inline';
@@ -37,25 +31,7 @@ import type { Decorator, Meta, StoryObj } from '@storybook/web-components-vite';
  * three has theme surface of its own beyond what the other cards already show.
  */
 
-const correctionRegistry = (() => {
-  const registry = new CustomElementRegistry();
-  const overrides = new Map<string, CustomElementConstructor>(
-    qtiCorrectionElements.map(({ tag, ctor }) => [tag, ctor])
-  );
-  const everyElement = [
-    ...qtiBaseElements,
-    ...qtiProcessingElements,
-    ...qtiContentElements,
-    ...qtiItemElements,
-    ...qtiTestElements,
-    ...qtiInteractionElements,
-    ...qtiCorrectionElements
-  ];
-  for (const { tag, ctor } of everyElement) {
-    if (!registry.get(tag)) registry.define(tag, overrides.get(tag) ?? ctor);
-  }
-  return registry;
-})();
+const correctionRegistry = createCorrectionRegistry();
 
 /**
  * The bench chrome — grid, cards, labels.
