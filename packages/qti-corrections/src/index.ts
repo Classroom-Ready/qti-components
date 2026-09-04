@@ -7,6 +7,10 @@ export { correctionPart } from './styles/correction.styles';
 export { CandidateCorrectionMixin } from './mixins/candidate-correction.mixin';
 export { ChoiceCorrectionMixin } from './mixins/choice-correction.mixin';
 export * from './context/correction-config';
+export * from './correction-registry';
+// Explicit `.js` specifier: `./elements` is ambiguous between `elements.ts`
+// (the tag→constructor list) and `elements/index.ts` (the class barrel below).
+export { qtiCorrectionElements } from './elements.js';
 export * from './elements/index';
 export * from './components/qti-assessment-item-correction';
 export * from './components/qti-item-correction';

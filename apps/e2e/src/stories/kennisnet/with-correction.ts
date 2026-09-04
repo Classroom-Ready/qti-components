@@ -1,12 +1,6 @@
 import { nothing, render } from 'lit';
 
-import { qtiBaseElements } from '@qti-components/base/elements';
-import { qtiContentElements } from '@qti-components/elements/elements';
-import { qtiInteractionElements } from '@qti-components/interactions/elements';
-import { qtiItemElements } from '@qti-components/item/elements';
-import { qtiProcessingElements } from '@qti-components/processing/elements';
-import { qtiCorrectionElements } from '@qti-components/corrections/elements';
-import { qtiTestElements } from '@qti-components/test/elements';
+import { createCorrectionRegistry } from '@qti-components/corrections';
 
 // eslint-disable-next-line import/no-relative-packages
 import itemCss from '../../../../../packages/qti-theme/src/item.css?inline';
@@ -14,27 +8,7 @@ import kennisnetCss from './kennisnet.css?inline';
 
 import type { Decorator } from '@storybook/web-components-vite';
 
-const correctionRegistry = (() => {
-  const registry = new CustomElementRegistry();
-  const overrides = new Map<string, CustomElementConstructor>(
-    qtiCorrectionElements.map(({ tag, ctor }) => [tag, ctor])
-  );
-  const everyElement = [
-    ...qtiBaseElements,
-    ...qtiProcessingElements,
-    ...qtiContentElements,
-    ...qtiItemElements,
-    ...qtiTestElements,
-    ...qtiInteractionElements,
-    ...qtiCorrectionElements
-  ];
-
-  for (const { tag, ctor } of everyElement) {
-    if (!registry.get(tag)) registry.define(tag, overrides.get(tag) ?? ctor);
-  }
-
-  return registry;
-})();
+export const correctionRegistry = createCorrectionRegistry();
 
 const itemSheet = new CSSStyleSheet();
 itemSheet.replaceSync(itemCss);

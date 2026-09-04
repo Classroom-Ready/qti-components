@@ -42,11 +42,16 @@ export const ChoiceCorrectionMixin = <T extends AbstractConstructor<ChoicesCorre
       }
     }
 
-    public override toggleCandidateCorrection(show: boolean): void {
-      super.toggleCandidateCorrection(show);
+    public override toggleCandidateCorrection(show: boolean, accumulate = false): void {
+      super.toggleCandidateCorrection(show, accumulate);
 
-      for (const choice of this._choiceElements) {
-        choice.candidateCorrection = null;
+      // Accumulating leaves the marks from earlier attempts in place, so a
+      // wrong pick the candidate has moved away from stays flagged; otherwise
+      // they are recomputed from the current response. Hiding always clears.
+      if (!accumulate || !show) {
+        for (const choice of this._choiceElements) {
+          choice.candidateCorrection = null;
+        }
       }
 
       if (!show || !this.correctResponse) {

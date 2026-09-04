@@ -271,7 +271,7 @@ export const CorrectResponseMixin = <T extends AbstractConstructor<Interaction>>
       }
     }
 
-    public toggleCandidateCorrection(show: boolean): void {
+    public toggleCandidateCorrection(show: boolean, _accumulate = false): void {
       if (!show) {
         return;
       }
@@ -311,7 +311,12 @@ export interface CorrectResponseInterface {
   readonly correctness: Readonly<Correctness | null>;
   readonly correctionPart: string;
   toggleCorrectResponse(show: boolean): void;
-  toggleCandidateCorrection(show: boolean): void;
+  /**
+   * @param accumulate When showing, add to the marks already on screen rather
+   *   than recomputing them from the current response — so a wrong pick from an
+   *   earlier attempt stays flagged. Hiding always clears, regardless of mode.
+   */
+  toggleCandidateCorrection(show: boolean, accumulate?: boolean): void;
   /** Protected at runtime; exposed here so subclasses can call `super.toggleInternalCorrectResponse()`. */
   toggleInternalCorrectResponse(show: boolean): void;
   /** Protected at runtime. */

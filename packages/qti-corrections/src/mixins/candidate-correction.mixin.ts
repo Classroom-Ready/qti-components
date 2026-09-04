@@ -14,18 +14,23 @@ export const CandidateCorrectionMixin = <T extends AbstractConstructor<Interacti
       return this._candidateCorrection ? `correction correction-${this._candidateCorrection}` : 'correction';
     }
 
-    public override toggleCandidateCorrection(show: boolean): void {
+    public override toggleCandidateCorrection(show: boolean, accumulate = false): void {
       if (this.showCandidateCorrection !== show) {
         this.showCandidateCorrection = show;
       }
 
-      super.toggleCandidateCorrection(show);
+      super.toggleCandidateCorrection(show, accumulate);
 
       const internals = (this as unknown as { _internals: ElementInternals })._internals;
 
-      internals.states.delete('candidate-correct');
-      internals.states.delete('candidate-partially-correct');
-      internals.states.delete('candidate-incorrect');
+      // Accumulating keeps the interaction-level verdict from earlier attempts
+      // alongside this one; otherwise it is recomputed from the current
+      // response. Hiding always clears, regardless of mode.
+      if (!accumulate || !show) {
+        internals.states.delete('candidate-correct');
+        internals.states.delete('candidate-partially-correct');
+        internals.states.delete('candidate-incorrect');
+      }
 
       let verdict: 'correct' | 'incorrect' | 'partially-correct' | null = null;
 
@@ -44,7 +49,9 @@ export const CandidateCorrectionMixin = <T extends AbstractConstructor<Interacti
         }
       }
 
-      if (this._candidateCorrection !== verdict) {
+      // While accumulating, an attempt that yields no verdict must not erase the
+      // one already on screen.
+      if (this._candidateCorrection !== verdict && !(accumulate && show && verdict === null)) {
         this._candidateCorrection = verdict;
       }
     }

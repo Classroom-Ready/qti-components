@@ -6,13 +6,27 @@
  *
  * Keep this exercising the PUBLIC surface a consumer actually touches, not obscure corners.
  */
-import { QtiChoiceInteractionCorrection } from '@citolab/qti-components/corrections';
+import {
+  createCorrectionRegistry,
+  qtiCorrectionElements,
+  QtiChoiceInteractionCorrection
+} from '@citolab/qti-components/corrections';
 import { QtiChoiceInteraction, QtiHotspotInteraction } from '@citolab/qti-components';
 import type { QtiTest, TestContainer } from '@citolab/qti-components/qti-test';
 import type { LitElement } from 'lit';
 
-// Registering a correction subclass under the standard tag is the documented way to opt in.
-customElements.define('qti-choice-interaction', QtiChoiceInteractionCorrection);
+// Correction elements take the standard tag names, so they are opted into through
+// a scoped registry — handed to a shadow root, and to each container.
+declare const host: HTMLElement;
+declare const testContainer: TestContainer & { customElementRegistry: CustomElementRegistry };
+const correctionRegistry = createCorrectionRegistry();
+host.attachShadow({ mode: 'open', customElementRegistry: correctionRegistry });
+testContainer.customElementRegistry = correctionRegistry;
+
+// The tag→constructor list is reachable too, for a consumer that would rather
+// register the variants itself (before anything claims the standard tags).
+const correctionTags: readonly string[] = qtiCorrectionElements.map(({ tag }) => tag);
+const correction: CustomElementConstructor = QtiChoiceInteractionCorrection;
 const plain: CustomElementConstructor = QtiChoiceInteraction;
 
 // Interactions must satisfy the standard Lit mixin constraint.
@@ -29,5 +43,7 @@ declare const test: QtiTest;
 const cb = test.postLoadTransformCallback;
 
 void plain;
+void correction;
+void correctionTags;
 void container;
 void cb;
