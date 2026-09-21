@@ -1,0 +1,23 @@
+# actionlint configuration. See https://github.com/rhysd/actionlint/blob/main/docs/config.md
+#
+# actionlint checks a step's inputs against metadata it bundles for popular
+# actions, and its bundled copy of actions/create-github-app-token@v3 describes
+# release v3.0.0: `app-id` required, no `client-id`.
+#
+# The action's own action.yml at the v3 tag defines `client-id` and marks
+# `app-id` optional and deprecated in its favour — that arrived in release
+# v3.1.0 (2026-04-11, https://github.com/actions/create-github-app-token/pull/353),
+# after actionlint's newest release (v1.7.12, 2026-03-30). `private-key` is now
+# the action's only required input. Workflows here pass `client-id` and run
+# green, so the two error messages below report only actionlint's own staleness.
+#
+# Tracked upstream as https://github.com/rhysd/actionlint/issues/669 and
+# https://github.com/rhysd/actionlint/issues/648. Delete this file's `paths`
+# section once an actionlint release carries regenerated metadata for the
+# action. The patterns name the action, so a genuine typo in an input key
+# (`client_id`, say) is still reported.
+paths:
+  .github/workflows/**/*.{yml,yaml}:
+    ignore:
+      - 'missing input "app-id" which is required by action "actions/create-github-app-token@v3"'
+      - 'input "client-id" is not defined in action "actions/create-github-app-token@v3"'
