@@ -29,23 +29,6 @@ async function expectNavTo(qtiTest: QtiTest, navItemRefId: string) {
   await new Promise(resolve => setTimeout(resolve, 100));
 }
 
-// test-end-attempt is a no-op until the active item ref exposes its rendered
-// assessmentItem, so wait for that before clicking it.
-async function expectActiveItemLoaded(qtiTest: QtiTest) {
-  const testContainer = qtiTest.querySelector('test-container');
-  await expect
-    .poll(
-      () =>
-        Boolean(
-          testContainer?.shadowRoot?.querySelector<HTMLElement & { assessmentItem?: unknown }>(
-            `qti-assessment-item-ref[identifier="${qtiTest.sessionContext.navItemRefId}"]`
-          )?.assessmentItem
-        ),
-      { timeout: 5000 }
-    )
-    .toBe(true);
-}
-
 describe('navigation-mode', () => {
   describe('Nonlinear', () => {
     let container: HTMLDivElement;
@@ -175,7 +158,6 @@ describe('navigation-mode', () => {
       // 1. In linear/individual mode, Next should be disabled until end-attempt
       expect(nextBtn).toBeDisabled();
 
-      await expectActiveItemLoaded(qtiTest);
       endAttemptBtn.click();
       await expect.poll(() => nextBtn, { timeout: 5000 }).toBeEnabled();
 
@@ -187,7 +169,6 @@ describe('navigation-mode', () => {
 
       // answer the question
       qtiTest.testContext.items[1].variables['RESPONSE'] = 'York';
-      await expectActiveItemLoaded(qtiTest);
       endAttemptBtn.click();
 
       expect(prevBtn).toBeDisabled();
