@@ -106,6 +106,10 @@ bot's as superseded.
 - For TypeScript classes, prefer ECMAScript private fields using `#name` instead of the `private` modifier.
 - When using `#` private fields, do not prefix private names with underscores.
 - Validate behavior with the narrowest useful command first, then broader checks.
+- Every new component or feature ships a `.stories.ts` next to its `.ts` and `.spec.ts`
+  (as `qti-feedback-block` does). Stories are how a reviewer sees the behaviour and how
+  Storybook's interaction tests exercise it in a real browser. When no conformance XML fits,
+  build the QTI markup inline in the story and drive the behaviour in its `play` function.
 - If a package contains its own `AGENTS.md`, treat it as authoritative for package-local conventions.
 
 ## Safety And Review
