@@ -46,6 +46,17 @@ only branch/merge/release mechanics differ.
 - Type check: `pnpm tsc`
 - Lint: `pnpm lint`
 
+## Claude Code Cloud Sessions
+
+`.claude/hooks/session-start.sh` prepares a cloud session to run `pnpm test`: it installs
+dependencies against the committed lockfile, and exports `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`
+so `vitest.config.ts` launches the image's preinstalled Chromium. The image cannot download the
+Chromium build this repo's Playwright expects, so `playwright install` fails there.
+
+The portable-custom-interaction stories load require.js and jQuery from public CDNs, so the
+environment's network access must allow `cdnjs.cloudflare.com` and `code.jquery.com` (and
+`unpkg.com`, which the PCI iframe uses off localhost). Without them those stories time out.
+
 ## Committed Generated Files
 
 `public/mockServiceWorker.js` is written by msw's postinstall on every `pnpm install`, in msw's

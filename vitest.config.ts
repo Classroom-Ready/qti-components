@@ -8,6 +8,12 @@ import { playwright } from '@vitest/browser-playwright';
 
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
+// Claude Code cloud sessions can't download Playwright's own Chromium build, so
+// .claude/hooks/session-start.sh points this at the one preinstalled in the image.
+const chromiumExecutablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+const browserProvider = () =>
+  playwright(chromiumExecutablePath ? { launchOptions: { executablePath: chromiumExecutablePath } } : undefined);
+
 export default defineConfig({
   base: process.env.VITEST ? undefined : './',
   plugins: [tsconfigPaths()],
@@ -65,7 +71,7 @@ export default defineConfig({
           browser: {
             enabled: true,
             // @ts-ignore
-            provider: playwright(),
+            provider: browserProvider(),
             headless: true,
             viewport: { width: 1280, height: 600 },
             screenshotFailures: false,
@@ -99,7 +105,7 @@ export default defineConfig({
           browser: {
             enabled: true,
             // @ts-ignore
-            provider: playwright(),
+            provider: browserProvider(),
             headless: true, // Both modes work fine
             screenshotFailures: false,
             instances: [{ browser: 'chromium', headless: true }]
